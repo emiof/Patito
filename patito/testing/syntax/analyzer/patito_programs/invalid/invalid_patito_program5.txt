@@ -1,0 +1,30 @@
+programa programa5_valido;
+
+var
+    x, y : entero;
+    resultado : flotante;
+    
+nula calcularPromedio(a: entero, b: entero, peso: flotante){
+    var promedio: flotante;
+
+    {
+        promedio = (a + b) / 2 * peso;
+        escribe("El promedio ponderado es: ", promedio);
+
+    }
+};
+
+inicio {
+    x = 20;
+    y = 40;
+    1_resultado = 1.;
+
+    escribe("Llamando a calcularPromedio con x, y y peso: ", x, y, resultado);
+    calcularPromedio(x, y, resultado);
+    
+    si (resultado > 30){
+        escribe("El resultado ponderado es mayor que 30.");
+    };
+}
+
+fin

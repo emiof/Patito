@@ -1,0 +1,25 @@
+programa programa4_invalido;
+
+var a, b, c : entero; d : flotante;
+
+inicio {
+    a = 5;
+    b = 10;
+    c = a + b;
+    escribe("Resultado inicial: ", c);
+    
+    si (c > 10) {
+        c = c - 5;
+        escribe("c es mayor que 10, nuevo valor de c: ", c);
+    } sino {
+        c = c + 5;
+        escribe("c no es mayor que 10, nuevo valor de c: ", c);
+    };
+
+    mientras (c % 50) haz {
+        c = c + 10;
+        print("Valor de c en el ciclo: ", c);
+    };
+}
+
+fin

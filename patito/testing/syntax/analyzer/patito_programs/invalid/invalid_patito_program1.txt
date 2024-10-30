@@ -1,0 +1,13 @@
+programa programa1_invalido; 
+
+var a, b, c: entero; d, e: flotante; 
+
+inicio {
+    a = 1 + 1
+    b = 2 * 2
+    c = 3 - 3;
+    d = 2 / 2;
+    e = 2 / 2 * 2 + 2;
+}
+
+fin

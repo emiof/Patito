@@ -1,0 +1,23 @@
+programa programa3_valido;
+
+var i, total: entero;
+
+nula myFunc(a: entero){
+    {
+        total = a * 2;
+    }
+};
+
+inicio {
+    i = 1;
+    total = 0;
+
+    mientras (i < 5) haz {
+        myFunc(i);
+        i = i + 1;
+    };
+
+    escribe (total);
+}
+
+fin

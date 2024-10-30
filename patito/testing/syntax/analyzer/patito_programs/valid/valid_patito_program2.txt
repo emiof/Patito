@@ -1,0 +1,16 @@
+programa programa2_valido;
+
+var a, b : entero;
+
+inicio {
+    a = 10;
+    b = 20;
+    
+    si (a > b){
+        escribe ("a is greater than b");
+    } sino {
+        escribe ('a is not greater than b');
+    };
+}
+
+fin
