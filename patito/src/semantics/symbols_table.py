@@ -15,6 +15,9 @@ class Symbol:
 
         self.symbols_table: None | SymbolsTable = None
 
+    def has_table(self) -> bool:
+        return self.symbols_table is not None
+
     @property 
     def table(self) -> 'SymbolsTable':
         """
@@ -25,6 +28,9 @@ class Symbol:
     
     def __eq__(self, other: 'Symbol') -> bool:
         return self.id == other.id and self.parent_table_id == other.parent_table_id
+    
+    def __str__(self) -> str:
+        return f"[{self.id}, {self.value}, {self.symbol_type.name}, {self.parent_table_id}]"
 
 class SymbolsTable:
     """
@@ -58,3 +64,18 @@ class SymbolsTable:
         Determines if a symbol with the given id exists in the table. 
         """
         return symbol_id in self.symbols
+    
+    def to_list(self) -> list['Symbol']:
+        return list(self.symbols.values())
+    
+    def __str__(self) -> str:
+        return self.__print_table(self.to_list(), 1)
+
+    def __print_table(self, symbols: list[Symbol], level: int) -> str:
+        if not symbols:
+            return ""
+        
+        curr_symbol: str = "\n" + "-" * level ** 2 + symbols[0].__str__()
+        rest_table: str = self.__print_table(symbols[1:], level)
+        
+        return curr_symbol + (self.__print_table(symbols[0].table.to_list(), level+1) if symbols[0].has_table() else "") + rest_table 
