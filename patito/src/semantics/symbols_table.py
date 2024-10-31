@@ -47,13 +47,15 @@ class SymbolsTable:
         self.table_id = table_id
         self.symbols: dict[str, Symbol] = {}
 
-    def search_symbol(self, symbol_id: str) -> Symbol | None:
+    def get_symbol(self, symbol_id: str) -> Symbol:
         """
-        Returns the symbol identified by symbol_id within the table. If not found, returns None. 
+        Returns the symbol identified by symbol_id within the table. If not found, an error is raised. 
         The search is not outreaching and is performed only at the current table,
         and not at any nested tables contained within. 
         """
-        return self.symbols.get(symbol_id, None)        
+        if not self.symbol_exists(symbol_id):
+            raise Exception(f"symbol with id '{symbol_id}' not found")
+        return self.symbols[symbol_id]       
     
     def add_symbol(self, symbol: Symbol) -> Symbol:
         """
@@ -88,7 +90,7 @@ class SymbolsTable:
         if not tables_path:
             return curr_table
 
-        next_table: 'Symbol' | None = curr_table.search_symbol(tables_path[0]).table
+        next_table: 'Symbol' | None = curr_table.get_symbol(tables_path[0]).table
         return self.___get_table_at_aux(next_table, tables_path[1:])
     
     def to_list(self) -> list[Symbol]:

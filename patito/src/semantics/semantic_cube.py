@@ -24,6 +24,9 @@ class SemanticCube:
         x, y, z = type_1.value, type_2.value, oper.value
         return self.cube[x, y, z] is not None
     
+    def __str__(self) -> str:
+        return "".join(["\n" + self.cube[:, :, i].__str__() for i in range(self.cube.shape[2])])
+
     @staticmethod
     def create_cube() -> np.ndarray:
         def get_operator_strategy(operator: PatitoOperator) -> Callable:
@@ -34,6 +37,8 @@ class SemanticCube:
                     return division_strategy
                 case PatitoOperator.MAYOR_A | PatitoOperator.MENOR_A | PatitoOperator.IGUALDAD | PatitoOperator.INIGUALDAD:
                     return relational_strategy
+                case PatitoOperator.ASIGNACION:
+                    return assignment_strategy
                 case _: 
                     return none_strategy
                 
