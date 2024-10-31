@@ -22,16 +22,7 @@ class Symbol:
     @staticmethod
     def set_symbols_type(symbols: list['Symbol'], symbol_type: SymbolType) -> None:
         for s in symbols:
-            s.symbol_type = symbol_type
-    
-    @staticmethod
-    def build_symbols(ids: list[str], symbol_type: SymbolType, values: list[any] | None = None) -> list['Symbol']:
-        if values != None:
-            if len(ids) != len(values):
-                raise Exception("the number of ids doesn't match the number of values")
-            return [Symbol(id=id, value=value, symbol_type=symbol_type) for id, value in zip(ids, values)]
-        else:
-            return [Symbol(id=id, value=None, symbol_type=symbol_type) for id in ids]            
+            s.symbol_type = symbol_type         
 
     @property 
     def table(self) -> 'SymbolsTable':
