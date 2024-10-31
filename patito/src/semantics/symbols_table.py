@@ -54,12 +54,13 @@ class SymbolsTable:
         and not at any nested tables contained within. 
         """
         return self.symbols.get(symbol_id, None)        
-
+    
     def add_symbol(self, symbol: Symbol) -> Symbol:
         """
-        Adds a new symbol to the table. If a symbol with the same id is already present in the table, it is
-        overwritten.
+        Adds a new symbol to the table. If a symbol with the same id is already present in the table, an error is raised. 
         """
+        if self.symbol_exists(symbol.id):
+            raise Exception("redeclaration of symbol.")
         symbol.parent_table_id = self.table_id
         self.symbols[symbol.id] = symbol
 

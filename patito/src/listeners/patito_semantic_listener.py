@@ -21,18 +21,15 @@ class PatitoSemanticListener(PatitoListener):
 
     def enterLista_id(self, ctx: PatitoParser.Lista_idContext):
         if ctx.getChildCount() > 0:
-            var_symbol: Symbol = Symbol(id=ctx.ID().getText())
-            self.ids_symbols_stack.push(var_symbol)
+            self.ids_symbols_stack.push(Symbol(id=ctx.ID().getText()))
     
     def enterLista_id_1(self, ctx: PatitoParser.Lista_idContext):
         if ctx.getChildCount() > 0:
-            var_symbol: Symbol = Symbol(id=ctx.ID().getText())
-            self.ids_symbols_stack.push(var_symbol)
+            self.ids_symbols_stack.push(Symbol(id=ctx.ID().getText()))
 
     def enterId_tipo(self, ctx: PatitoParser.Id_tipoContext):
         if ctx.getChildCount() > 0:
-            var_symbol: Symbol = Symbol(id=ctx.ID().getText())
-            self.ids_symbols_stack.push(var_symbol)
+            self.ids_symbols_stack.push(Symbol(id=ctx.ID().getText()))
 
     def enterTipo(self, ctx: PatitoParser.TipoContext):
         symbol_type: SymbolType = SymbolType.to_symbol_type(ctx.getChild(0).getText())
