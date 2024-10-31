@@ -22,22 +22,22 @@ def table() -> SymbolsTable:
     return table
 
 def test_search(table: SymbolsTable) -> None:
-    assert table.symbol_exists("var1") and table.search_symbol("var1").id == 'var1'
-    assert table.symbol_exists("var2") and table.search_symbol("var2").id == 'var2'
-    assert table.symbol_exists("fun1") and table.search_symbol("fun1").id == 'fun1'
+    assert table.symbol_exists("var1") and table.get_symbol("var1").id == 'var1'
+    assert table.symbol_exists("var2") and table.get_symbol("var2").id == 'var2'
+    assert table.symbol_exists("fun1") and table.get_symbol("fun1").id == 'fun1'
 
 def test_deep_search(table: SymbolsTable) -> None:
-    fun1: Symbol | None = table.search_symbol('fun1')
+    fun1: Symbol | None = table.get_symbol('fun1')
     assert fun1 is not None
-    assert fun1.table.symbol_exists('var3') and fun1.table.search_symbol('var3').id == 'var3'
+    assert fun1.table.symbol_exists('var3') and fun1.table.get_symbol('var3').id == 'var3'
 
 def test_add(table: SymbolsTable) -> None:
     table.add_symbol(Symbol(id='new_var', value=10, symbol_type=SymbolType.ENTERO))
-    assert table.search_symbol('new_var') is not None and table.search_symbol('new_var').id == 'new_var'
+    assert table.get_symbol('new_var') is not None and table.get_symbol('new_var').id == 'new_var'
 
 def test_deep_add(table: SymbolsTable) -> None:
     fun2: Symbol = Symbol(id='fun2', value=None, symbol_type=SymbolType.FUNCION)
     fun2.table.add_symbol(Symbol(id='var4', value=10, symbol_type=SymbolType.ENTERO))
     table.add_symbol(fun2)
 
-    assert table.symbol_exists('fun2') and table.search_symbol('fun2').table.symbol_exists('var4')    
+    assert table.symbol_exists('fun2') and table.get_symbol('fun2').table.symbol_exists('var4')    

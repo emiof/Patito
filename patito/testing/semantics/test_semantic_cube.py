@@ -14,7 +14,8 @@ def cube() -> SemanticCube:
     (PatitoType.ENTERO, PatitoOperator.DIVISION, PatitoType.ENTERO, PatitoType.FLOTANTE),
     (PatitoType.FLOTANTE, PatitoOperator.MAYOR_A, PatitoType.FLOTANTE, PatitoType.ENTERO),
     (PatitoType.ENTERO, PatitoOperator.IGUALDAD, PatitoType.FLOTANTE, PatitoType.ENTERO),
+    (PatitoType.ENTERO, PatitoOperator.ASIGNACION, PatitoType.FLOTANTE, None),
+    (PatitoType.ENTERO, PatitoOperator.ASIGNACION, PatitoType.ENTERO, PatitoType.ENTERO),
 ])
-def test_get_result_type(cube: SemanticCube, type_1: PatitoType, oper: PatitoOperator, type_2: PatitoType, result_type: PatitoType) -> None:
+def test_get_result_type(cube: SemanticCube, type_1: PatitoType, oper: PatitoOperator, type_2: PatitoType, result_type: PatitoType | None) -> None:
     assert cube.get_result_type(type_1, type_2, oper) == result_type
-
