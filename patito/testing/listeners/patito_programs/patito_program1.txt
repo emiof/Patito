@@ -1,9 +1,9 @@
 programa programa1;
 
-var i, total, casa: flotante;
+var i, total, casas: flotante;
 
 nula myFunc1(a: entero){
-    var r, b: flotante;
+    var r, i: flotante;
 
     {
         r = 10;
