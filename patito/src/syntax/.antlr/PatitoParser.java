@@ -140,14 +140,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_programa; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterPrograma(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitPrograma(this);
-		}
 	}
 
 	public final ProgramaContext programa() throws RecognitionException {
@@ -203,14 +195,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_var; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterVar(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitVar(this);
-		}
 	}
 
 	public final VarContext var() throws RecognitionException {
@@ -253,14 +237,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_opc_var; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterOpc_var(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitOpc_var(this);
-		}
 	}
 
 	public final Opc_varContext opc_var() throws RecognitionException {
@@ -316,14 +292,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_extension_var; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterExtension_var(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitExtension_var(this);
-		}
 	}
 
 	public final Extension_varContext extension_var() throws RecognitionException {
@@ -381,14 +349,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_cuerpo; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterCuerpo(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitCuerpo(this);
-		}
 	}
 
 	public final CuerpoContext cuerpo() throws RecognitionException {
@@ -437,14 +397,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_estatuto; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterEstatuto(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitEstatuto(this);
-		}
 	}
 
 	public final EstatutoContext estatuto() throws RecognitionException {
@@ -514,14 +466,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_opc_lista_estatuto; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterOpc_lista_estatuto(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitOpc_lista_estatuto(this);
-		}
 	}
 
 	public final Opc_lista_estatutoContext opc_lista_estatuto() throws RecognitionException {
@@ -576,14 +520,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_imprime; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterImprime(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitImprime(this);
-		}
 	}
 
 	public final ImprimeContext imprime() throws RecognitionException {
@@ -625,14 +561,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_expresion_o_letrero; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterExpresion_o_letrero(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitExpresion_o_letrero(this);
-		}
 	}
 
 	public final Expresion_o_letreroContext expresion_o_letrero() throws RecognitionException {
@@ -688,14 +616,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_lista_expresion_o_letrero; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterLista_expresion_o_letrero(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitLista_expresion_o_letrero(this);
-		}
 	}
 
 	public final Lista_expresion_o_letreroContext lista_expresion_o_letrero() throws RecognitionException {
@@ -734,14 +654,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_lista_expresion_o_letrero_1; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterLista_expresion_o_letrero_1(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitLista_expresion_o_letrero_1(this);
-		}
 	}
 
 	public final Lista_expresion_o_letrero_1Context lista_expresion_o_letrero_1() throws RecognitionException {
@@ -794,14 +706,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_asigna; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterAsigna(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitAsigna(this);
-		}
 	}
 
 	public final AsignaContext asigna() throws RecognitionException {
@@ -848,14 +752,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_ciclo; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterCiclo(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitCiclo(this);
-		}
 	}
 
 	public final CicloContext ciclo() throws RecognitionException {
@@ -903,14 +799,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_expresion; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterExpresion(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitExpresion(this);
-		}
 	}
 
 	public final ExpresionContext expresion() throws RecognitionException {
@@ -948,14 +836,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_opc_operador_relacional_expresion; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterOpc_operador_relacional_expresion(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitOpc_operador_relacional_expresion(this);
-		}
 	}
 
 	public final Opc_operador_relacional_expresionContext opc_operador_relacional_expresion() throws RecognitionException {
@@ -1011,14 +891,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_lista_expresion; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterLista_expresion(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitLista_expresion(this);
-		}
 	}
 
 	public final Lista_expresionContext lista_expresion() throws RecognitionException {
@@ -1057,14 +929,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_lista_expresion_1; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterLista_expresion_1(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitLista_expresion_1(this);
-		}
 	}
 
 	public final Lista_expresion_1Context lista_expresion_1() throws RecognitionException {
@@ -1114,14 +978,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_opc_lista_expresion; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterOpc_lista_expresion(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitOpc_lista_expresion(this);
-		}
 	}
 
 	public final Opc_lista_expresionContext opc_lista_expresion() throws RecognitionException {
@@ -1172,14 +1028,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_exp; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterExp(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitExp(this);
-		}
 	}
 
 	public final ExpContext exp() throws RecognitionException {
@@ -1212,14 +1060,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_termino; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterTermino(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitTermino(this);
-		}
 	}
 
 	public final TerminoContext termino() throws RecognitionException {
@@ -1255,14 +1095,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_lista_termino; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterLista_termino(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitLista_termino(this);
-		}
 	}
 
 	public final Lista_terminoContext lista_termino() throws RecognitionException {
@@ -1303,14 +1135,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_lista_termino_1; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterLista_termino_1(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitLista_termino_1(this);
-		}
 	}
 
 	public final Lista_termino_1Context lista_termino_1() throws RecognitionException {
@@ -1375,14 +1199,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_factor; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterFactor(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitFactor(this);
-		}
 	}
 
 	public final FactorContext factor() throws RecognitionException {
@@ -1443,14 +1259,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_lista_factor; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterLista_factor(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitLista_factor(this);
-		}
 	}
 
 	public final Lista_factorContext lista_factor() throws RecognitionException {
@@ -1491,14 +1299,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_lista_factor_1; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterLista_factor_1(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitLista_factor_1(this);
-		}
 	}
 
 	public final Lista_factor_1Context lista_factor_1() throws RecognitionException {
@@ -1556,14 +1356,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_tipo; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterTipo(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitTipo(this);
-		}
 	}
 
 	public final TipoContext tipo() throws RecognitionException {
@@ -1606,14 +1398,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_lista_id; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterLista_id(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitLista_id(this);
-		}
 	}
 
 	public final Lista_idContext lista_id() throws RecognitionException {
@@ -1650,14 +1434,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_lista_id_1; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterLista_id_1(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitLista_id_1(this);
-		}
 	}
 
 	public final Lista_id_1Context lista_id_1() throws RecognitionException {
@@ -1709,14 +1485,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_id_tipo; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterId_tipo(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitId_tipo(this);
-		}
 	}
 
 	public final Id_tipoContext id_tipo() throws RecognitionException {
@@ -1756,14 +1524,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_lista_id_tipo; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterLista_id_tipo(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitLista_id_tipo(this);
-		}
 	}
 
 	public final Lista_id_tipoContext lista_id_tipo() throws RecognitionException {
@@ -1802,14 +1562,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_lista_id_tipo_1; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterLista_id_tipo_1(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitLista_id_tipo_1(this);
-		}
 	}
 
 	public final Lista_id_tipo_1Context lista_id_tipo_1() throws RecognitionException {
@@ -1859,14 +1611,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_opc_lista_id_tipo; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterOpc_lista_id_tipo(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitOpc_lista_id_tipo(this);
-		}
 	}
 
 	public final Opc_lista_id_tipoContext opc_lista_id_tipo() throws RecognitionException {
@@ -1925,14 +1669,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_func; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterFunc(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitFunc(this);
-		}
 	}
 
 	public final FuncContext func() throws RecognitionException {
@@ -1986,14 +1722,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_opc_lista_func; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterOpc_lista_func(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitOpc_lista_func(this);
-		}
 	}
 
 	public final Opc_lista_funcContext opc_lista_func() throws RecognitionException {
@@ -2045,14 +1773,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_llamada; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterLlamada(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitLlamada(this);
-		}
 	}
 
 	public final LlamadaContext llamada() throws RecognitionException {
@@ -2092,14 +1812,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_cte; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterCte(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitCte(this);
-		}
 	}
 
 	public final CteContext cte() throws RecognitionException {
@@ -2151,14 +1863,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_condicion; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterCondicion(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitCondicion(this);
-		}
 	}
 
 	public final CondicionContext condicion() throws RecognitionException {
@@ -2204,14 +1908,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_opc_sino; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterOpc_sino(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitOpc_sino(this);
-		}
 	}
 
 	public final Opc_sinoContext opc_sino() throws RecognitionException {
@@ -2260,14 +1956,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_operador_relacional; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterOperador_relacional(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitOperador_relacional(this);
-		}
 	}
 
 	public final Operador_relacionalContext operador_relacional() throws RecognitionException {
@@ -2308,14 +1996,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_suma_o_resta; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterSuma_o_resta(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitSuma_o_resta(this);
-		}
 	}
 
 	public final Suma_o_restaContext suma_o_resta() throws RecognitionException {
@@ -2357,14 +2037,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_opc_suma_o_resta; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterOpc_suma_o_resta(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitOpc_suma_o_resta(this);
-		}
 	}
 
 	public final Opc_suma_o_restaContext opc_suma_o_resta() throws RecognitionException {
@@ -2412,14 +2084,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_multiplicacion_o_division; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterMultiplicacion_o_division(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitMultiplicacion_o_division(this);
-		}
 	}
 
 	public final Multiplicacion_o_divisionContext multiplicacion_o_division() throws RecognitionException {
@@ -2462,14 +2126,6 @@ public class PatitoParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_id_o_cte; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).enterId_o_cte(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PatitoListener ) ((PatitoListener)listener).exitId_o_cte(this);
-		}
 	}
 
 	public final Id_o_cteContext id_o_cte() throws RecognitionException {

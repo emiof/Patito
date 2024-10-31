@@ -40,5 +40,4 @@ def test_deep_add(table: SymbolsTable) -> None:
     fun2.table.add_symbol(Symbol(id='var4', value=10, symbol_type=SymbolType.ENTERO))
     table.add_symbol(fun2)
 
-    assert table.symbol_exists('fun2') and table.search_symbol('fun2').table.symbol_exists('var4')
-    
+    assert table.symbol_exists('fun2') and table.search_symbol('fun2').table.symbol_exists('var4')    
