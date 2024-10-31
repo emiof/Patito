@@ -2,7 +2,7 @@
 
 import pytest
 
-from antlr4 import FileStream, CommonTokenStream
+from ...utils import build_parser
 from ....src.syntax import PatitoParser
 from ....src.syntax import PatitoLexer
 from ....src.listeners.patito_error_listener import PatitoErrorListener
@@ -22,14 +22,6 @@ invalid_programs: list[tuple[str, int]] = [
     ("testing/syntax/analyzer/patito_programs/invalid/invalid_patito_program4.txt", 2),
     ("testing/syntax/analyzer/patito_programs/invalid/invalid_patito_program5.txt", 2),
 ]
-
-def build_parser(patito_program_path: str) -> PatitoParser:
-    """
-    Intializes an instance of the Patito parser, using as token stream the text file located in the provided path. 
-    """
-    patito_lexer = PatitoLexer(FileStream(patito_program_path))
-    token_stream = CommonTokenStream(patito_lexer)
-    return PatitoParser(token_stream)
 
 @pytest.mark.parametrize("patito_program_path", valid_programs)
 def test_valid_program(patito_program_path: str):

@@ -1,0 +1,35 @@
+programa programa1;
+
+var i, total, casa: flotante;
+
+nula myFunc1(a: entero){
+    var r, b: flotante;
+
+    {
+        r = 10;
+        total = a * 2;
+    }
+};
+
+nula myFunc2(z: entero){
+    var h: entero;
+
+    {
+        r = 10;
+        total = a * 2;
+    }
+};
+
+inicio {
+    i = 1;
+    total = 0;
+
+    mientras (i < 5) haz {
+        myFunc(i);
+        i = i + 1;
+    };
+
+    escribe (total);
+}
+
+fin

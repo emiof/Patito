@@ -9,7 +9,7 @@ else:
 class PatitoListener(ParseTreeListener):
 
     # Enter a parse tree produced by PatitoParser#programa.
-    def enterPrograma(self, ctx:PatitoParser.ProgramaContext):
+    def enterPrograma(self, ctx: PatitoParser.ProgramaContext):
         pass
 
     # Exit a parse tree produced by PatitoParser#programa.
