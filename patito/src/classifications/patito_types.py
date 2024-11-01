@@ -15,7 +15,7 @@ class SymbolType(Enum):
         return f"{self.name}"
     
     @staticmethod
-    def to_symbol_type(type_token: Literal["entero", "flotante"]) -> 'SymbolType':
+    def to_type(type_token: Literal["entero", "flotante"]) -> 'SymbolType':
         match type_token:
             case "entero":
                 return SymbolType.ENTERO

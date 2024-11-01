@@ -20,7 +20,7 @@ class Symbol:
         return self.symbols_table is not None
     
     @staticmethod
-    def set_symbols_type(symbols: list['Symbol'], symbol_type: SymbolType) -> None:
+    def set_type(symbols: list['Symbol'], symbol_type: SymbolType) -> None:
         for s in symbols:
             s.symbol_type = symbol_type         
 
