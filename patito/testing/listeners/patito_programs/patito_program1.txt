@@ -11,7 +11,7 @@ nula myFunc1(a: entero){
     }
 };
 
-nula myFunc2(z: entero){
+nula myFunc2(z: entero, r: flotante){
     var h: entero;
 
     {

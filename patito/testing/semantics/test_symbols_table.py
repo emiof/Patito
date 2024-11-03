@@ -3,23 +3,26 @@
 import pytest
 from ...src.semantics.symbols_table import SymbolsTable, Symbol
 from ...src.classifications import SymbolType
+from ...src.containers import Stack
 
 @pytest.fixture
 def table() -> SymbolsTable:
-    var1 = Symbol(id='var1', value=10, symbol_type=SymbolType.ENTERO)
-    var2 = Symbol(id='var2', value=1.5, symbol_type=SymbolType.FLOTANTE)
-    fun1 = Symbol(id='fun1', value=None, symbol_type=SymbolType.FUNCION)
+    root_table = SymbolsTable('global')
+    curr_table: SymbolsTable = root_table
     
-    var3 = Symbol(id='var3', value=5, symbol_type=SymbolType.ENTERO)
-    fun1.table.add_symbol(var3)
-    
-    table = SymbolsTable('global')
+    var1 = Symbol(id='var1', symbol_type=SymbolType.ENTERO)
+    var2 = Symbol(id='var2', symbol_type=SymbolType.FLOTANTE)
+    fun1 = Symbol(id='fun1', symbol_type=SymbolType.FUNCION)
 
-    table.add_symbol(var1)
-    table.add_symbol(var2)
-    table.add_symbol(fun1)
+    curr_table.add_symbol(var1)
+    curr_table.add_symbol(var2)
+    curr_table.add_symbol(fun1)
 
-    return table
+    var3 = Symbol(id='var3', symbol_type=SymbolType.ENTERO)  
+
+    curr_table.get_symbol('fun1').table.add_symbol(var3)
+
+    return root_table
 
 def test_search(table: SymbolsTable) -> None:
     assert table.symbol_exists("var1") and table.get_symbol("var1").id == 'var1'
@@ -27,17 +30,15 @@ def test_search(table: SymbolsTable) -> None:
     assert table.symbol_exists("fun1") and table.get_symbol("fun1").id == 'fun1'
 
 def test_deep_search(table: SymbolsTable) -> None:
-    fun1: Symbol | None = table.get_symbol('fun1')
-    assert fun1 is not None
-    assert fun1.table.symbol_exists('var3') and fun1.table.get_symbol('var3').id == 'var3'
+    assert table.symbol_exists('var3', at=['fun1']) and table.get_symbol('var3', at=['fun1']).id == 'var3'
 
 def test_add(table: SymbolsTable) -> None:
-    table.add_symbol(Symbol(id='new_var', value=10, symbol_type=SymbolType.ENTERO))
-    assert table.get_symbol('new_var') is not None and table.get_symbol('new_var').id == 'new_var'
+    table.add_symbol(Symbol(id='new_var', symbol_type=SymbolType.ENTERO))
+    assert table.get_symbol('new_var').id == 'new_var'
 
 def test_deep_add(table: SymbolsTable) -> None:
-    fun2: Symbol = Symbol(id='fun2', value=None, symbol_type=SymbolType.FUNCION)
-    fun2.table.add_symbol(Symbol(id='var4', value=10, symbol_type=SymbolType.ENTERO))
+    fun2: Symbol = Symbol(id='fun2', symbol_type=SymbolType.FUNCION)
+    fun2.table.add_symbol(Symbol(id='var4', symbol_type=SymbolType.ENTERO))
     table.add_symbol(fun2)
 
     assert table.symbol_exists('fun2') and table.get_symbol('fun2').table.symbol_exists('var4')    
