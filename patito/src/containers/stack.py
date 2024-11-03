@@ -1,8 +1,8 @@
-from typing import TypeVar
+from typing import TypeVar, Generic
 
 T = TypeVar('T')
 
-class Stack:
+class Stack(Generic[T]):
     def __init__(self, vals: list[T] | None = None):
         self.stack: list[T] = vals if vals is not None else []
 
@@ -15,13 +15,10 @@ class Stack:
 
         return self.stack.pop()
     
-    def pop_all(self) -> list[T]:        
+    def pop_all(self, as_queue: bool = False) -> list[T]:        
         items: list[T] = self.stack.copy()
         self.stack.clear()
-        return items
-
-    def empty(self) -> bool:
-        return len(self.stack) == 0
+        return items if as_queue else items[::-1]
     
     def peek(self) -> T:
         if len(self.stack) == 0:
@@ -29,8 +26,10 @@ class Stack:
         
         return self.stack[-1]
     
-    @property
-    def items(self) -> list[str]:
-        return self.stack
+    def peek_all(self, as_queue: bool = False) -> list[T]:
+        return self.stack if as_queue else self.stack[::-1]
+    
+    def empty(self) -> bool:
+        return len(self.stack) == 0
     
 
