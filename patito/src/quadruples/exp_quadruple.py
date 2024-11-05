@@ -6,7 +6,7 @@ from ..containers import Stack, Pair
 OperatorPair = Pair[str, PatitoOperator]
 OperandPair = Pair[str, PatitoType]
 
-class Quadruple:
+class ExpQuadruple:
     semantic_cube: SemanticCube = SemanticCube()
 
     def __init__(
@@ -16,7 +16,7 @@ class Quadruple:
             operand_2: OperandPair,
             result_name: str | None = None
     ):
-        result_type: PatitoType | None = Quadruple.semantic_cube.get_result_type(operator.second, operand_1.second, operand_2.second)
+        result_type: PatitoType | None = ExpQuadruple.semantic_cube.get_result_type(operator.second, operand_1.second, operand_2.second)
         if result_type is None:
             raise Exception(f"semantically invalid operation:{operand_1.second.name} {operator.second.name} {operand_2.second.name}")
         
@@ -34,11 +34,11 @@ class Quadruple:
         return self.items[-1]
 
     @staticmethod
-    def assignment(operand_1: OperandPair, operand_2: OperandPair) -> 'Quadruple':
-        return Quadruple(Pair("=", PatitoOperator.ASIGNACION), operand_1, operand_2)
+    def assignment(operand_1: OperandPair, operand_2: OperandPair) -> 'ExpQuadruple':
+        return ExpQuadruple(Pair("=", PatitoOperator.ASIGNACION), operand_1, operand_2)
     
     @staticmethod
-    def print_quadruples(quadruples: list['Quadruple']) -> None:
+    def print_quadruples(quadruples: list['ExpQuadruple']) -> None:
         print("\n=====")
         for quad in quadruples:
             print(quad.__str__())

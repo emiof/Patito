@@ -1,10 +1,10 @@
 from typing import Any
 from ..containers import Stack, Pair
-from .quadruple import OperandPair, OperatorPair, Quadruple
+from .exp_quadruple import OperandPair, OperatorPair, ExpQuadruple
 from ..semantics import Symbol
 from ..classifications import token_mapper, PatitoType, PatitoOperator
 
-class QuadrupleBuilder:
+class ExpQuadrupleBuilder:
     result_counter: int = 0
 
     def __init__(self, expression: list[str], global_variables: dict[str, Symbol], local_variables: dict[str, Symbol]):
@@ -16,12 +16,12 @@ class QuadrupleBuilder:
 
         self.operand_stack: Stack[OperandPair] = Stack()
         self.operator_stack: Stack[OperatorPair] = Stack()
-        self.quadruples: list[Quadruple] = []
+        self.quadruples: list[ExpQuadruple] = []
 
         expression.append("$")
         self.token_stack: Stack[Pair[str, PatitoOperator | PatitoType | None]] = Stack([Pair(token, token_mapper(token)) for token in expression[::-1]])
 
-    def build_quadruples(self) -> list[Quadruple]:
+    def build_quadruples(self) -> list[ExpQuadruple]:
         while not self.token_stack.empty():
             curr_token, curr_token_type = self.token_stack.peek()
             if curr_token == "$": # reached end of expression
@@ -43,10 +43,10 @@ class QuadrupleBuilder:
 
     def __push_quadruple(self) -> None:
         operand_1, operand_2 = self.operand_stack.pop_n(2)
-        quadruple: Quadruple = Quadruple(self.operator_stack.pop(), operand_1, operand_2, f"t{QuadrupleBuilder.result_counter}")
+        quadruple: ExpQuadruple = ExpQuadruple(self.operator_stack.pop(), operand_1, operand_2, f"t{ExpQuadrupleBuilder.result_counter}")
         self.quadruples.append(quadruple)
         self.operand_stack.push(quadruple.result)
-        QuadrupleBuilder.result_counter += 1
+        ExpQuadrupleBuilder.result_counter += 1
 
     def __push_remaining_quadruples(self) -> None:
         while not self.operator_stack.empty():
