@@ -14,9 +14,9 @@ class ExpQuadrupleBuilder:
         self.operand_stack: Stack[OperandPair] = Stack()
         self.operator_stack: Stack[OperatorPair | None] = Stack([None])
         self.quadruples: list[ExpQuadruple] = []
+        self.token_stack: Stack[Pair[str, PatitoOperator | PatitoType | None]] = Stack([Pair(token, token_mapper(token)) for token in expression[::-1]])
 
         expression.append("$")
-        self.token_stack: Stack[Pair[str, PatitoOperator | PatitoType | None]] = Stack([Pair(token, token_mapper(token)) for token in expression[::-1]])
 
     def build_quadruples(self) -> list[ExpQuadruple]:
         while not self.token_stack.empty():
@@ -43,8 +43,7 @@ class ExpQuadrupleBuilder:
         self.token_stack.pop()
 
     def __push_quadruple(self) -> None:
-        operand_1, operand_2 = self.operand_stack.pop_n(2)
-        quadruple: ExpQuadruple = ExpQuadruple(self.operator_stack.pop(), operand_1, operand_2)
+        quadruple: ExpQuadruple = ExpQuadruple(self.operator_stack.pop(), *self.operand_stack.pop_n(2))
         self.quadruples.append(quadruple)
         self.operand_stack.push(quadruple.result)
 

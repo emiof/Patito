@@ -8,7 +8,7 @@ nula myFunc1(a: entero){
     {
         a = 5;
         r = 10 + 2;
-        total = a * 2 + 5 * 8 - 2;
+        total = a * 2 + 5 * (8 - 2);
     }
 };
 
