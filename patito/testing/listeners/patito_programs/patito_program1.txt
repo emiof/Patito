@@ -1,35 +1,36 @@
 programa programa1;
 
-var i, total, casas: flotante;
+var i, total, casas: entero;
 
 nula myFunc1(a: entero){
-    var r, i: flotante;
+    var r, i: entero;
 
     {
-        r = 10;
-        total = a * 2;
+        a = 5 + 5 > 10;
+        r = 10 + 2;
+        total = a * 2 + 5 * 8 - 2;
     }
 };
 
-nula myFunc2(z: entero, r: flotante){
+nula myFunc2(z: entero, r: entero){
     var h: entero;
 
     {
-        r = 10;
-        total = a * 2;
+        r = 10 + 5;
+        total = z * 2;
     }
 };
 
 inicio {
-    i = 1;
-    total = 0;
+    i = 1 + 2;
+    total = 0 + 1;
 
     mientras (i < 5) haz {
-        myFunc(i);
+        myFunc1(i);
         i = i + 1;
     };
 
-    escribe (total);
+    escribe(total);
 }
 
 fin

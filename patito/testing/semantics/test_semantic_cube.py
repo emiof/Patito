@@ -18,4 +18,4 @@ def cube() -> SemanticCube:
     (PatitoType.ENTERO, PatitoOperator.ASIGNACION, PatitoType.ENTERO, PatitoType.ENTERO),
 ])
 def test_get_result_type(cube: SemanticCube, type_1: PatitoType, oper: PatitoOperator, type_2: PatitoType, result_type: PatitoType | None) -> None:
-    assert cube.get_result_type(type_1, type_2, oper) == result_type
+    assert cube.get_result_type(oper, type_1, type_2) == result_type
