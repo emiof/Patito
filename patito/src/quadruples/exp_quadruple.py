@@ -7,6 +7,7 @@ OperatorPair = Pair[str, PatitoOperator]
 OperandPair = Pair[str, PatitoType]
 
 class ExpQuadruple:
+    result_counter: int = 0
     semantic_cube: SemanticCube = SemanticCube()
 
     def __init__(
@@ -20,8 +21,9 @@ class ExpQuadruple:
         if result_type is None:
             raise Exception(f"semantically invalid operation:{operand_1.second.name} {operator.second.name} {operand_2.second.name}")
         
-        result: OperandPair = Pair("result" if result_name is None else result_name, result_type)
+        result: OperandPair = Pair(f"t{ExpQuadruple.result_counter}", result_type)
         self.items: tuple[OperatorPair, OperandPair, OperandPair, OperandPair] = (operator, operand_1, operand_2, result)
+        ExpQuadruple.result_counter += 1
 
     def __iter__(self) -> Iterator[OperatorPair | OperandPair]:
         yield from self.items

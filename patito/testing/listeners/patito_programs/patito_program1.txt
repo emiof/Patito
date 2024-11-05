@@ -6,9 +6,9 @@ nula myFunc1(a: entero){
     var r, i: entero;
 
     {
-        a = 5 + 5 > 10;
+        a = 5;
         r = 10 + 2;
-        total = a * 2 + 5 * 8 - 2;
+        total = a * 2 + 5 * (8 - 2);
     }
 };
 

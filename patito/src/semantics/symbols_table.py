@@ -59,9 +59,6 @@ class Symbol:
             return self.__attrs
         raise Exception("attempting to access function attributes of a non-function symbol")
     
-    def __eq__(self, other: 'Symbol') -> bool:
-        return self.id == other.id and self.table_id == other.table_id
-    
     def __str__(self) -> str:
         parent_id: str | None = self.parent_table.id if self.parent_table is not None else None
         signature: Optional[list[PatitoType]] = None if self.symbol_type != SymbolType.FUNCTION else self.function_attrs.signature
