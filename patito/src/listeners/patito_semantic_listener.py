@@ -3,7 +3,7 @@ from ..semantics import SymbolsTable, Symbol
 from ..classifications import SymbolType, PatitoType, token_mapper
 from ..containers import Stack, Pair
 from .tree_traversal import extract_id, extract_type, extract_expression
-from ..quadruple import Quadruple, QuadrupleBuilder, OperandPair, OperatorPair
+from ..quadruples import ExpQuadruple, ExpQuadrupleBuilder, FlowQuadruple, OperandPair, OperatorPair
 
 class PatitoSemanticListener(PatitoListener):
     def __init__(self):
@@ -19,7 +19,7 @@ class PatitoSemanticListener(PatitoListener):
         self.in_param_list: bool = False
 
         # quadruples
-        self.quadruples: list[Quadruple] = []
+        self.quadruples: list[ExpQuadruple | FlowQuadruple] = []
 
     def enterFunc(self, ctx: PatitoParser.FuncContext) -> None:
         # Entering function declaration 
@@ -80,10 +80,10 @@ class PatitoSemanticListener(PatitoListener):
 
         if len(expression_tokens) == 1:
             assigner: OperandPair = Pair(expression_tokens[0], token_mapper(expression_tokens[0]))
-            self.quadruples.append(Quadruple.assignment(assignee, assigner))
+            self.quadruples.append(ExpQuadruple.assignment(assignee, assigner))
         else:
-            self.quadruples += QuadrupleBuilder(expression_tokens, self.root_table.get_variables(), self.curr_table.get_variables()).build_quadruples()
-            assignment_quadr = Quadruple.assignment(assignee, self.quadruples[-1].result)
+            self.quadruples += ExpQuadrupleBuilder(expression_tokens, self.root_table.get_variables(), self.curr_table.get_variables()).build_quadruples()
+            assignment_quadr = ExpQuadruple.assignment(assignee, self.quadruples[-1].result)
             self.quadruples.append(assignment_quadr)
         
     def enterLlamada(self, ctx: PatitoParser.LlamadaContext):
@@ -98,7 +98,7 @@ class PatitoSemanticListener(PatitoListener):
     def getSymbolsTable(self) -> SymbolsTable:
         return self.root_table
     
-    def getQuadruples(self) -> list[Quadruple]:
+    def getQuadruples(self) -> list[ExpQuadruple]:
         return self.quadruples
     
     def __push_to_id_stack(self, id_token: str):

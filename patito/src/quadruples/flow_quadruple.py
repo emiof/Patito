@@ -1,0 +1,4 @@
+
+
+class FlowQuadruple:
+    pass 
