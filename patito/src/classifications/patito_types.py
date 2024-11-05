@@ -9,28 +9,14 @@ class PatitoType(Enum):
         return f"{self.name}"
     
     @staticmethod
-    def to_type(type_token: Literal["entero", "flotante"]) -> 'SymbolType':
+    def to_type(type_token: Literal["entero", "flotante", "ENTERO", "FLOTANTE"]) -> 'PatitoType':
         match type_token:
-            case "entero":
+            case "entero" | "ENTERO":
                 return PatitoType.ENTERO
-            case "flotante":
+            case "flotante" | "FLOTANTE":
                 return PatitoType.FLOTANTE
+            case _: 
+                raise Exception(f"cannot convert token {type_token} to PatitoType")
 
-class SymbolType(Enum):
-    ENTERO = 0
-    FLOTANTE = 1
-    FUNCION = 2
-    UNDEFINED = 3
-
-    def __str__(self) -> str:
-        return f"{self.name}"
-    
-    @staticmethod
-    def to_type(type_token: Literal["entero", "flotante"]) -> 'SymbolType':
-        match type_token:
-            case "entero":
-                return SymbolType.ENTERO
-            case "flotante":
-                return SymbolType.FLOTANTE
 
         

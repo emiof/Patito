@@ -15,6 +15,13 @@ class Stack(Generic[T]):
 
         return self.stack.pop()
     
+    def pop_n(self, n: int) -> list[T]:
+        if n > len(self.stack):
+            raise Exception("number of items to remove is greater than the number of stack items")
+        removed_items: list[T] = self.stack[-n:]
+        self.stack = self.stack[:-n]
+        return removed_items
+    
     def pop_all(self, as_queue: bool = False) -> list[T]:        
         items: list[T] = self.stack.copy()
         self.stack.clear()
@@ -31,5 +38,11 @@ class Stack(Generic[T]):
     
     def empty(self) -> bool:
         return len(self.stack) == 0
+    
+    def size(self) -> int:
+        return len(self.stack)
+    
+    def __str__(self) -> str:
+        return ", ".join([item.__str__() for item in self.stack])
     
 

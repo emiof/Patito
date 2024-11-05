@@ -1,7 +1,9 @@
 # Python Version: 3.11.8
 
 from ..classifications import SymbolType, PatitoType
-from typing import Union
+from .variable_attrs import VariableAttrs
+from .function_attrs import FunctionAttrs
+from typing import Optional
 
 class Symbol:
     """
@@ -11,43 +13,59 @@ class Symbol:
     def __init__(
             self, *,
             id: str,
-            symbol_type: SymbolType = SymbolType.UNDEFINED,
-            table_id: str | None = None,
+            symbol_type: SymbolType,
+            parent_table: Optional['SymbolsTable'] = None,
             is_initialized: bool = False,
-            signature: list[PatitoType] | None = []
+            attrs: Optional[VariableAttrs | FunctionAttrs] = None
     ):
         self.id: str = id
         self.symbol_type: SymbolType = symbol_type
-        self.parent_table: SymbolsTable | None = table_id
+        self.parent_table: Optional['SymbolsTable'] = parent_table
         self.is_initialized: bool = is_initialized
-        self.signature: list[PatitoType] | None = signature
+        self.__attrs: Optional[VariableAttrs | FunctionAttrs] = None
 
-        self.symbols_table: None | SymbolsTable = None
+        self.symbols_table: Optional['SymbolsTable'] = None
 
     def has_table(self) -> bool:
         return self.symbols_table is not None
     
     @staticmethod
-    def set_type(symbols: list['Symbol'], symbol_type: SymbolType) -> None:
+    def set_type(symbols: list['Symbol'], variable_type: PatitoType) -> None:
         for s in symbols:
-            s.symbol_type = symbol_type         
+            s.variable_attrs.variable_type = variable_type 
 
     @property 
     def table(self) -> 'SymbolsTable':
         """
         Returns the symbol's own table of symbols. If the symbol doesn't have one, one is initialized. 
         """
-        if self.symbol_type != SymbolType.FUNCION:
-            raise Exception("attempting to access table of non-function symbol")
-        self.symbols_table = SymbolsTable(self.id, self) if self.symbols_table is None else self.symbols_table
-        return self.symbols_table
+        if self.symbol_type == SymbolType.FUNCTION:
+            self.symbols_table = SymbolsTable(self.id, self) if self.symbols_table is None else self.symbols_table
+            return self.symbols_table
+        raise Exception("attempting to access table of non-function symbol")
+
+    
+    @property
+    def variable_attrs(self) -> VariableAttrs:
+        if self.symbol_type == SymbolType.VARIABLE:
+            self.__attrs = VariableAttrs() if self.__attrs is None else self.__attrs
+            return self.__attrs
+        raise Exception("attempting to access variable attributes of a non-variable symbol")
+    
+    @property
+    def function_attrs(self) -> FunctionAttrs:
+        if self.symbol_type == SymbolType.FUNCTION:
+            self.__attrs = FunctionAttrs() if self.__attrs is None else self.__attrs
+            return self.__attrs
+        raise Exception("attempting to access function attributes of a non-function symbol")
     
     def __eq__(self, other: 'Symbol') -> bool:
         return self.id == other.id and self.table_id == other.table_id
     
     def __str__(self) -> str:
         parent_id: str | None = self.parent_table.id if self.parent_table is not None else None
-        return f"[ID: {self.id}, TYPE: {self.symbol_type.name}, PARENT: {parent_id}, SIGNATURE: {self.signature}, INIT: {self.is_initialized}]"
+        signature: Optional[list[PatitoType]] = None if self.symbol_type != SymbolType.FUNCTION else self.function_attrs.signature
+        return f"[ID: {self.id}, TYPE: {self.symbol_type.name}, PARENT: {parent_id}, SIGNATURE: {signature}, INIT: {self.is_initialized}]"
 
 class SymbolsTable:
     """
@@ -99,9 +117,12 @@ class SymbolsTable:
         target_table: 'SymbolsTable' = self.__get_table(curr_table=self, scope_path=at)
         return symbol_id in target_table.symbols
     
-    def get_ids(self, at: list[str] = []) -> list[Symbol]:
+    def get_ids(self, *, at: list[str] = []) -> list[Symbol]:
         target_table: 'SymbolsTable' = self.__get_table(curr_table=self, scope_path=at)
         return list(target_table.symbols.values())
+    
+    def get_variables(self, *, at: list[str] = []) -> dict[str, Symbol]:
+        return {id:symbol for id, symbol in self.symbols.items() if symbol.symbol_type == SymbolType.VARIABLE}
     
     def __str__(self) -> str:
         return self.__print_table(self.get_ids(), 1)

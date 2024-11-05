@@ -7,8 +7,6 @@ from itertools import product
 from typing import Callable
 from .operator_strategies import *
 
-ResultType = PatitoType | None
-
 class SemanticCube:
     """
     
@@ -16,11 +14,11 @@ class SemanticCube:
     def __init__(self):
         self.cube: np.ndarray = SemanticCube.create_cube()
 
-    def get_result_type(self, type_1: PatitoType, type_2: PatitoType, oper: PatitoOperator) -> ResultType:
+    def get_result_type(self, oper: PatitoOperator, type_1: PatitoType, type_2: PatitoType) -> PatitoType | None:
         x, y, z = type_1.value, type_2.value, oper.value
         return self.cube[x, y, z]
 
-    def is_valid_operation(self, type_1: PatitoType, type_2: PatitoType, oper: PatitoOperator) -> bool:
+    def is_valid_operation(self, oper: PatitoOperator, type_1: PatitoType, type_2: PatitoType) -> bool:
         x, y, z = type_1.value, type_2.value, oper.value
         return self.cube[x, y, z] is not None
     
