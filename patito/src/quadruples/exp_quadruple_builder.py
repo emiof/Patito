@@ -1,12 +1,9 @@
-from typing import Any
 from ..containers import Stack, Pair
 from .exp_quadruple import OperandPair, OperatorPair, ExpQuadruple
 from ..semantics import Symbol
 from ..classifications import token_mapper, PatitoType, PatitoOperator
 
 class ExpQuadrupleBuilder:
-    result_counter: int = 0
-
     def __init__(self, expression: list[str], global_variables: dict[str, Symbol], local_variables: dict[str, Symbol]):
         if len(expression) < 3:
             raise Exception("attempting to process simple expression")
@@ -15,7 +12,7 @@ class ExpQuadrupleBuilder:
         self.local_variables: dict[str, Symbol] = local_variables
 
         self.operand_stack: Stack[OperandPair] = Stack()
-        self.operator_stack: Stack[OperatorPair] = Stack()
+        self.operator_stack: Stack[OperatorPair | None] = Stack([None])
         self.quadruples: list[ExpQuadruple] = []
 
         expression.append("$")
@@ -29,29 +26,33 @@ class ExpQuadrupleBuilder:
             elif isinstance(curr_token_type, PatitoType): # found constant operand
                 self.__push_constant_operand()
             elif isinstance(curr_token_type, PatitoOperator): # found operator
-                if not self.operator_stack.empty() and PatitoOperator.has_precedence(self.operator_stack.peek().second, curr_token_type):
+                if self.operator_stack.peek() is not None and PatitoOperator.has_precedence(self.operator_stack.peek().second, curr_token_type):
                     self.__push_quadruple()
                 self.__push_operator()
             elif curr_token == '(': # found opening parenthesis
-                pass
+                self.__push_stack_botttom()
             elif curr_token == ')': # found closing gparenthesis
-                pass
+                self.__push_remaining_quadruples()
             else: # found id operand 
                 self.__push_id_operand()
 
         return self.quadruples
+    
+    def __push_stack_botttom(self) -> None:
+        self.operator_stack.push(None)
+        self.token_stack.pop()
 
     def __push_quadruple(self) -> None:
         operand_1, operand_2 = self.operand_stack.pop_n(2)
-        quadruple: ExpQuadruple = ExpQuadruple(self.operator_stack.pop(), operand_1, operand_2, f"t{ExpQuadrupleBuilder.result_counter}")
+        quadruple: ExpQuadruple = ExpQuadruple(self.operator_stack.pop(), operand_1, operand_2)
         self.quadruples.append(quadruple)
         self.operand_stack.push(quadruple.result)
-        ExpQuadrupleBuilder.result_counter += 1
 
     def __push_remaining_quadruples(self) -> None:
-        while not self.operator_stack.empty():
+        while self.operator_stack.peek() is not None:
             self.__push_quadruple()
 
+        self.operator_stack.pop()
         self.token_stack.pop()
 
     def __push_constant_operand(self) -> None:
