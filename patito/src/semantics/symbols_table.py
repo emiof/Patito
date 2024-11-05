@@ -4,6 +4,7 @@ from ..classifications import SymbolType, PatitoType
 from .variable_attrs import VariableAttrs
 from .function_attrs import FunctionAttrs
 from typing import Optional
+from ..exceptions import SemanticError
 
 class Symbol:
     """
@@ -16,7 +17,6 @@ class Symbol:
             symbol_type: SymbolType,
             parent_table: Optional['SymbolsTable'] = None,
             is_initialized: bool = False,
-            attrs: Optional[VariableAttrs | FunctionAttrs] = None
     ):
         self.id: str = id
         self.symbol_type: SymbolType = symbol_type
@@ -42,22 +42,22 @@ class Symbol:
         if self.symbol_type == SymbolType.FUNCTION:
             self.symbols_table = SymbolsTable(self.id, self) if self.symbols_table is None else self.symbols_table
             return self.symbols_table
-        raise Exception("attempting to access table of non-function symbol")
+        raise IndexError("attempting to access table of non-function symbol")
 
-    
+
     @property
     def variable_attrs(self) -> VariableAttrs:
         if self.symbol_type == SymbolType.VARIABLE:
             self.__attrs = VariableAttrs() if self.__attrs is None else self.__attrs
             return self.__attrs
-        raise Exception("attempting to access variable attributes of a non-variable symbol")
+        raise IndexError("attempting to access variable attributes of a non-variable symbol")
     
     @property
     def function_attrs(self) -> FunctionAttrs:
         if self.symbol_type == SymbolType.FUNCTION:
             self.__attrs = FunctionAttrs() if self.__attrs is None else self.__attrs
             return self.__attrs
-        raise Exception("attempting to access function attributes of a non-function symbol")
+        raise IndexError("attempting to access function attributes of a non-function symbol")
     
     def __str__(self) -> str:
         parent_id: str | None = self.parent_table.id if self.parent_table is not None else None
@@ -83,7 +83,7 @@ class SymbolsTable:
         target_table: 'SymbolsTable' = self.__get_table(curr_table=self, scope_path=at)
 
         if symbol_id not in target_table.symbols:
-            raise Exception(f"unable to locate symbol with id {symbol_id}")
+            raise ValueError(f"unable to locate symbol with id {symbol_id}")
         
         return target_table.symbols[symbol_id]
     
@@ -94,7 +94,7 @@ class SymbolsTable:
         target_table: 'SymbolsTable' = self.__get_table(curr_table=self, scope_path=at)
 
         if symbol.id in target_table.symbols:
-            raise Exception("redeclaration of symbol")
+            raise SemanticError.redeclaration(symbol.id)
         
         symbol.parent_table = self
         target_table.symbols[symbol.id] = symbol
@@ -141,4 +141,4 @@ class SymbolsTable:
         if next_table in self.symbols:
             return self.__get_table(curr_table=self.symbols[next_table].table, scope_path=scope_path[1:])
         
-        raise Exception(f"unable to locate target table of symbol {next_table}")
+        raise LookupError(f"unable to locate target table of symbol {next_table}")

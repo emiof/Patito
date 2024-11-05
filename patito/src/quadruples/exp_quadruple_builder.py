@@ -1,13 +1,15 @@
-from ..containers import Stack, Pair
-from .exp_quadruple import OperandPair, OperatorPair, ExpQuadruple
+from ..containers import Stack, Pair, OperatorPair, OperandPair
+from .exp_quadruple import ExpQuadruple
 from ..semantics import Symbol
 from ..classifications import token_mapper, PatitoType, PatitoOperator
+from ..exceptions import SemanticError
 
 class ExpQuadrupleBuilder:
     def __init__(self, expression: list[str], global_variables: dict[str, Symbol], local_variables: dict[str, Symbol]):
         if len(expression) < 3:
-            raise Exception("attempting to process simple expression")
+            raise ValueError("attempting to build quadruple from expression with less than three terms")
         
+        expression.append("$")
         self.global_variables: dict[str, Symbol] = global_variables
         self.local_variables: dict[str, Symbol] = local_variables
 
@@ -16,12 +18,10 @@ class ExpQuadrupleBuilder:
         self.quadruples: list[ExpQuadruple] = []
         self.token_stack: Stack[Pair[str, PatitoOperator | PatitoType | None]] = Stack([Pair(token, token_mapper(token)) for token in expression[::-1]])
 
-        expression.append("$")
-
     def build_quadruples(self) -> list[ExpQuadruple]:
         while not self.token_stack.empty():
             curr_token, curr_token_type = self.token_stack.peek()
-            if curr_token == "$": # reached end of expression
+            if curr_token == "$" or curr_token == ')': # reached end of expression
                 self.__push_remaining_quadruples()
             elif isinstance(curr_token_type, PatitoType): # found constant operand
                 self.__push_constant_operand()
@@ -31,8 +31,6 @@ class ExpQuadrupleBuilder:
                 self.__push_operator()
             elif curr_token == '(': # found opening parenthesis
                 self.__push_stack_botttom()
-            elif curr_token == ')': # found closing gparenthesis
-                self.__push_remaining_quadruples()
             else: # found id operand 
                 self.__push_id_operand()
 
@@ -61,7 +59,7 @@ class ExpQuadrupleBuilder:
         curr_token, _ = self.token_stack.peek()
         symbol: Symbol | None = self.local_variables.get(curr_token, self.global_variables.get(curr_token, None)) 
         if symbol is None:
-            raise Exception(f"encountered unidentified variable: '{curr_token}'")
+            raise SemanticError.undeclared_symbol(curr_token)
         
         self.operand_stack.push(Pair.to_operand_pair(symbol))
         self.token_stack.pop()

@@ -1,9 +1,8 @@
 # Python Version: 3.11.8
 
 import pytest
-from ...src.semantics.symbols_table import SymbolsTable, Symbol
+from ...src.semantics import SymbolsTable, Symbol
 from ...src.classifications import SymbolType, PatitoType
-from ...src.containers import Stack
 
 @pytest.fixture
 def table() -> SymbolsTable:

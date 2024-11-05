@@ -11,13 +11,13 @@ class Stack(Generic[T]):
 
     def pop(self) -> T:
         if len(self.stack) == 0:
-            raise Exception("empty stack")
+            raise IndexError("empty stack")
 
         return self.stack.pop()
     
     def pop_n(self, n: int) -> list[T]:
         if n > len(self.stack):
-            raise Exception("number of items to remove is greater than the number of stack items")
+            raise ValueError("number of items to remove is greater than the number of stack items")
         removed_items: list[T] = self.stack[-n:]
         self.stack = self.stack[:-n]
         return removed_items
@@ -29,7 +29,7 @@ class Stack(Generic[T]):
     
     def peek(self) -> T:
         if len(self.stack) == 0:
-            raise Exception("empty stack")
+            raise IndexError("empty stack")
         
         return self.stack[-1]
     
