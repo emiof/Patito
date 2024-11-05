@@ -6,7 +6,7 @@ nula myFunc1(a: entero){
     var r, i: entero;
 
     {
-        a = 5;
+        a = 5 + 5;
         r = 10 + 2;
         total = a * 2 + 5 * (8 - 2);
     }
@@ -25,9 +25,11 @@ inicio {
     i = 1 + 2;
     total = 0 + 1;
 
-    mientras (i < 5) haz {
+    si (i < 5 + 10 * 2) {
         myFunc1(i);
         i = i + 1;
+    } sino {
+        i = 10 * 5; 
     };
 
     escribe(total);
