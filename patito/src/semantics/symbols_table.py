@@ -11,13 +11,7 @@ class Symbol:
     Represents an element in the symbols table and contains the symbol's value as well as its semantic 
     information. 
     """
-    def __init__(
-            self, *,
-            id: str,
-            symbol_type: SymbolType,
-            parent_table: Optional['SymbolsTable'] = None,
-            is_initialized: bool = False,
-    ):
+    def __init__(self, *, id: str, symbol_type: SymbolType, parent_table: Optional['SymbolsTable'] = None, is_initialized: bool = False):
         self.id: str = id
         self.symbol_type: SymbolType = symbol_type
         self.parent_table: Optional['SymbolsTable'] = parent_table

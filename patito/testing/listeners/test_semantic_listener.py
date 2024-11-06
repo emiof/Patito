@@ -6,7 +6,7 @@ from ...src.semantics import SymbolsTable
 from ...src.quadruples import ExpQuadruple
 
 programs: list[tuple[str]] = [
-    ("testing/listeners/patito_programs/patito_program1.txt")
+    ("testing/listeners/patito_programs/patito_program3.txt")
 ]
 
 @pytest.mark.parametrize('program', programs)

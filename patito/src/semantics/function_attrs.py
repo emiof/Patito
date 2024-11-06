@@ -4,6 +4,6 @@ from typing import Optional
 
 @dataclass
 class FunctionAttrs:
-    signature: Optional[list[PatitoType] ]= None
+    signature: Optional[list[PatitoType]] = None
     referent: Optional[str] = None
     

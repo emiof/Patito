@@ -1,0 +1,16 @@
+programa programa2;
+
+var x: entero;
+
+inicio {
+    x = (1 + 1) * 2 + 5;
+
+    si (x > 5) {
+        x = x + 1;
+    } sino {
+        x = x - 1; 
+    };
+}
+
+fin
+
