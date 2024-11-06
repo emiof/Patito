@@ -107,6 +107,19 @@ class PatitoSemanticListener(PatitoListener):
     def enterOpc_sino(self, ctx: PatitoParser.Opc_sinoContext):
         self.quadruples.append(FlowQuadruple.GOTO_quadruple())
 
+    def enterCiclo(self, ctx: PatitoParser.CicloContext):
+        expression_tokens: list[str] = extract_expression(ctx)
+
+        if len(expression_tokens) == 1:
+            operand: OperandPair = Pair(expression_tokens[0], token_mapper(expression_tokens[0]))
+            self.quadruples.append(FlowQuadruple.GOTO_F_quadruple(operand))
+        else:
+            self.quadruples += ExpQuadrupleBuilder(expression_tokens, self.root_table.get_variables(), self.curr_table.get_variables()).build_quadruples()
+            self.quadruples.append(FlowQuadruple.GOTO_F_quadruple(self.quadruples[-1].result))
+
+    def exitCiclo(self, ctx: PatitoParser.CicloContext):
+        self.quadruples.append(FlowQuadruple.GOTO_quadruple())
+
     def getSymbolsTable(self) -> SymbolsTable:
         return self.root_table
     
