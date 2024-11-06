@@ -29,35 +29,35 @@ class PatitoSemanticListener(PatitoListener):
         self.curr_table = func_symbol.table
 
     def exitFunc(self, ctx: PatitoParser.FuncContext) -> None:
-        # Exiting function body 
+        # Exiting function body.
         self.curr_table = self.curr_table.parent_symbol.parent_table
 
     def enterOpc_lista_id_tipo(self, ctx: PatitoParser.Opc_lista_id_tipoContext):
-        # Entering function parameter list 
+        # Entering function parameter list.
         self.in_param_list = True
 
     def exitOpc_lista_id_tipo(self, ctx: PatitoParser.Opc_lista_id_tipoContext):
-        # Exiting function parameter list 
+        # Exiting function parameter list.
         self.in_param_list = False
         self.curr_table.parent_symbol.function_attrs.signature = self.function_param_stack.pop_all(as_queue=True)
 
     def enterLista_id(self, ctx: PatitoParser.Lista_idContext):
-        # Entering variable declaration 
+        # Entering variable declaration.
         if ctx.getChildCount() > 0:
             self.__push_to_id_stack(extract_id(ctx))
     
     def enterLista_id_1(self, ctx: PatitoParser.Lista_idContext):
-        # Entering variable declaration 
+        # Entering variable declaration.
         if ctx.getChildCount() > 0:
             self.__push_to_id_stack(extract_id(ctx))
 
     def enterId_tipo(self, ctx: PatitoParser.Id_tipoContext):
-        # Entering function parameter declaration 
+        # Entering function parameter declaration.
         if ctx.getChildCount() > 0:
             self.__push_to_id_stack(extract_id(ctx))
 
     def enterTipo(self, ctx: PatitoParser.TipoContext):
-        # Exiting type token 
+        # Exiting type token.
         type_token: str = extract_type(ctx)
         symbol_type: PatitoType = PatitoType.to_type(type_token)
         Symbol.set_type(self.id_stack.peek_all(as_queue=True), symbol_type)
@@ -68,12 +68,13 @@ class PatitoSemanticListener(PatitoListener):
             self.function_param_stack.push(PatitoType.to_type(type_token))
 
     def enterAsigna(self, ctx: PatitoParser.AsignaContext):
-        # Entering variable assignment 
+        # Entering variable assignment.
         id_token: str = extract_id(ctx)
         if not self.__symbol_exists(id_token):
             raise SemanticError.undeclared_symbol(id_token)
         
     def exitAsigna(self, ctx: PatitoParser.AsignaContext):
+        # Existing variable assignment.
         assignee_symbol: Symbol = self.__get_symbol(extract_id(ctx))
         assignee: OperandPair = Pair.to_operand_pair(assignee_symbol)
         expression_tokens: list[str] = extract_expression(ctx)
@@ -89,12 +90,13 @@ class PatitoSemanticListener(PatitoListener):
         assignee_symbol.is_initialized = True
         
     def enterLlamada(self, ctx: PatitoParser.LlamadaContext):
-        # Entering function call 
+        # Entering function call.
         id_token: str = extract_id(ctx)
         if not self.__symbol_exists(id_token):
             raise SemanticError.undeclared_symbol(id_token)
         
     def enterCondicion(self, ctx: PatitoParser.CicloContext):
+        # Entering if statement.
         expression_tokens: list[str] = extract_expression(ctx)
 
         if len(expression_tokens) == 1:
@@ -105,9 +107,11 @@ class PatitoSemanticListener(PatitoListener):
             self.quadruples.append(FlowQuadruple.GOTO_F_quadruple(self.quadruples[-1].result))
 
     def enterOpc_sino(self, ctx: PatitoParser.Opc_sinoContext):
+        # Entering 'else' body of the if statement. 
         self.quadruples.append(FlowQuadruple.GOTO_quadruple())
 
     def enterCiclo(self, ctx: PatitoParser.CicloContext):
+        # Entering while loop. 
         expression_tokens: list[str] = extract_expression(ctx)
 
         if len(expression_tokens) == 1:
@@ -118,6 +122,7 @@ class PatitoSemanticListener(PatitoListener):
             self.quadruples.append(FlowQuadruple.GOTO_F_quadruple(self.quadruples[-1].result))
 
     def exitCiclo(self, ctx: PatitoParser.CicloContext):
+        # Existing while loop.
         self.quadruples.append(FlowQuadruple.GOTO_quadruple())
 
     def getSymbolsTable(self) -> SymbolsTable:

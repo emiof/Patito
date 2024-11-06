@@ -1,0 +1,14 @@
+programa programa3;
+
+var x: flotante;
+
+inicio {
+    x = 5.5 * 2;
+
+    mientras (x + 10 != 0) haz {
+        x = 100.0; 
+    }; 
+}
+
+fin
+
