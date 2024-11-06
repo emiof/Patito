@@ -32,6 +32,10 @@ inicio {
         i = 10 * 5; 
     };
 
+    mientras(5 > 2) haz {
+        i = 10;
+    }; 
+
     escribe(total);
 }
 
