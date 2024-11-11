@@ -1,33 +1,33 @@
-from ..classifications import PatitoOperator, PatitoType
+from ..classifications import NumericOperator, VariableType
 import re
 
 entero_pattern: re.Pattern = re.compile(r"[0-9]+")
 flotante_pattern: re.Pattern = re.compile(r"[0-9]+\.[0-9]+")
 
-def token_mapper(token: str) -> PatitoOperator | PatitoType | None:
+def token_mapper(token: str) -> NumericOperator | VariableType | None:
     match token:
         case "*":
-            return PatitoOperator.MULTIPLICACION
+            return NumericOperator.MULTIPLICACION
         case "/":
-            return PatitoOperator.DIVISION
+            return NumericOperator.DIVISION
         case "+":
-            return PatitoOperator.SUMA
+            return NumericOperator.SUMA
         case '-':
-            return PatitoOperator.RESTA
+            return NumericOperator.RESTA
         case '==':
-            return PatitoOperator.IGUALDAD
+            return NumericOperator.IGUALDAD
         case '!=':
-            return PatitoOperator.INIGUALDAD
+            return NumericOperator.INIGUALDAD
         case '>':
-            return PatitoOperator.MAYOR_A
+            return NumericOperator.MAYOR_A
         case '<':
-            return PatitoOperator.MENOR_A
+            return NumericOperator.MENOR_A
         case '=':
-            return PatitoOperator.ASIGNACION
+            return NumericOperator.ASIGNACION
         case _ if entero_pattern.fullmatch(token):
-            return PatitoType.ENTERO
+            return VariableType.ENTERO
         case _ if flotante_pattern.fullmatch(token):
-            return PatitoType.FLOTANTE
+            return VariableType.FLOTANTE
         case _:
             return None
 

@@ -1,6 +1,6 @@
 from enum import Enum 
 
-class PatitoOperator(Enum):
+class NumericOperator(Enum):
     ASIGNACION = 0
     MAYOR_A = 1
     MENOR_A = 2
@@ -15,7 +15,7 @@ class PatitoOperator(Enum):
         return f"{self.name}"
         
     @staticmethod
-    def precedence_level(operator: 'PatitoOperator') -> int:
+    def precedence_level(operator: 'NumericOperator') -> int:
         if operator.value == 0:
             return 0
         elif 1 <= operator.value <= 4:
@@ -26,8 +26,8 @@ class PatitoOperator(Enum):
             return 3
     
     @staticmethod
-    def has_precedence(operator_1: 'PatitoOperator', operator_2: 'PatitoOperator') -> bool:
-        return PatitoOperator.precedence_level(operator_1) >= PatitoOperator.precedence_level(operator_2)
+    def has_precedence(operator_1: 'NumericOperator', operator_2: 'NumericOperator') -> bool:
+        return NumericOperator.precedence_level(operator_1) >= NumericOperator.precedence_level(operator_2)
 
 
 

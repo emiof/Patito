@@ -1,7 +1,7 @@
 from typing import TypeVar, Generic
 from collections.abc import Iterator
-from ..semantics import Symbol
-from ..classifications import PatitoType, PatitoOperator
+from ..semantics import VariableSymbol
+from ..classifications import VariableType, NumericOperator
 
 T1 = TypeVar('T1') 
 T2 = TypeVar('T2') 
@@ -27,8 +27,8 @@ class Pair(Generic[T1, T2]):
         return self.__second
     
     @staticmethod
-    def to_operand_pair(symbol: Symbol) -> 'Pair[str, PatitoType]':
-        return Pair(symbol.id, symbol.variable_attrs.variable_type)
+    def to_operand_pair(variable: VariableSymbol) -> 'Pair[str, VariableType]':
+        return Pair(variable.symbol_id, variable.variable_type)
     
-OperandPair = Pair[str, PatitoType]
-OperatorPair = Pair[str, PatitoOperator]
+OperandPair = Pair[str, VariableType]
+OperatorPair = Pair[str, NumericOperator]

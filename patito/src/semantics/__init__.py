@@ -1,4 +1,3 @@
-from .symbols_table import SymbolsTable, Symbol
+from .symbols_table import Symbol, VariableSymbol, FunctionSymbol, SymbolsTable
 from .semantic_cube import SemanticCube
-from .variable_attrs import VariableAttrs
-from .function_attrs import FunctionAttrs
+from .table_navigation import symbol_exists_uphill, get_symbol_uphill
