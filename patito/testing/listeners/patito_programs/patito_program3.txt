@@ -2,6 +2,12 @@ programa programa3;
 
 var x: flotante;
 
+nula func(a: entero, b: flotante) {
+    {
+        a = 10 + 5;
+    }
+}; 
+
 inicio {
     x = 5.5 * 2;
 

@@ -1,5 +1,5 @@
 from collections.abc import Iterator
-from ..classifications import PatitoOperator, PatitoType
+from ..classifications import NumericOperator, VariableType
 from ..semantics import SemanticCube
 from ..containers import  Pair, OperatorPair, OperandPair
 from ..exceptions import SemanticError
@@ -8,8 +8,8 @@ class ExpQuadruple:
     result_counter: int = 0
     semantic_cube: SemanticCube = SemanticCube()
 
-    def __init__(self, operator: OperatorPair, operand_1: OperandPair, operand_2: OperandPair,):
-        result_type: PatitoType | None = ExpQuadruple.semantic_cube.get_result_type(operator.second, operand_1.second, operand_2.second)
+    def __init__(self, operator: OperatorPair, operand_1: OperandPair, operand_2: OperandPair):
+        result_type: VariableType | None = ExpQuadruple.semantic_cube.get_result_type(operator.second, operand_1.second, operand_2.second)
         if result_type is None:
             raise SemanticError.invalid_operation(operand_1.second, operator.second, operand_2.second)
         
@@ -29,4 +29,4 @@ class ExpQuadruple:
 
     @staticmethod
     def assignment(operand_1: OperandPair, operand_2: OperandPair) -> 'ExpQuadruple':
-        return ExpQuadruple(Pair("=", PatitoOperator.ASIGNACION), operand_1, operand_2)
+        return ExpQuadruple(Pair("=", NumericOperator.ASIGNACION), operand_1, operand_2)

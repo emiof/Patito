@@ -1,4 +1,4 @@
-from ..classifications import PatitoOperator, PatitoType
+from ..classifications import NumericOperator, VariableType
 
 class SemanticError(Exception):
     def __init__(self, message: str):
@@ -13,7 +13,7 @@ class SemanticError(Exception):
         return cls(f"redeclaration of the symbol: '{token}'")
     
     @classmethod
-    def invalid_operation(cls: 'SemanticError', type_1: PatitoType, operator: PatitoOperator, type_2: PatitoType) -> 'SemanticError':
+    def invalid_operation(cls: 'SemanticError', type_1: VariableType, operator: NumericOperator, type_2: VariableType) -> 'SemanticError':
         return cls(f"semantically invalid operation involving: '{type_1.name}' {operator.name} {type_2.name}")
     
     @classmethod

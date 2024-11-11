@@ -1,21 +1,21 @@
 import pytest
 from ...src.semantics.semantic_cube import SemanticCube
-from ...src.classifications import PatitoType
-from ...src.classifications import PatitoOperator
+from ...src.classifications import VariableType
+from ...src.classifications import NumericOperator
 
 @pytest.fixture
 def cube() -> SemanticCube:
     return SemanticCube()
 
 @pytest.mark.parametrize('type_1, oper, type_2, result_type', [
-    (PatitoType.ENTERO, PatitoOperator.SUMA, PatitoType.FLOTANTE, PatitoType.FLOTANTE),
-    (PatitoType.ENTERO, PatitoOperator.SUMA, PatitoType.ENTERO, PatitoType.ENTERO),
-    (PatitoType.FLOTANTE, PatitoOperator.SUMA, PatitoType.ENTERO, PatitoType.FLOTANTE),
-    (PatitoType.ENTERO, PatitoOperator.DIVISION, PatitoType.ENTERO, PatitoType.FLOTANTE),
-    (PatitoType.FLOTANTE, PatitoOperator.MAYOR_A, PatitoType.FLOTANTE, PatitoType.ENTERO),
-    (PatitoType.ENTERO, PatitoOperator.IGUALDAD, PatitoType.FLOTANTE, PatitoType.ENTERO),
-    (PatitoType.ENTERO, PatitoOperator.ASIGNACION, PatitoType.FLOTANTE, None),
-    (PatitoType.ENTERO, PatitoOperator.ASIGNACION, PatitoType.ENTERO, PatitoType.ENTERO),
+    (VariableType.ENTERO, NumericOperator.SUMA, VariableType.FLOTANTE, VariableType.FLOTANTE),
+    (VariableType.ENTERO, NumericOperator.SUMA, VariableType.ENTERO, VariableType.ENTERO),
+    (VariableType.FLOTANTE, NumericOperator.SUMA, VariableType.ENTERO, VariableType.FLOTANTE),
+    (VariableType.ENTERO, NumericOperator.DIVISION, VariableType.ENTERO, VariableType.FLOTANTE),
+    (VariableType.FLOTANTE, NumericOperator.MAYOR_A, VariableType.FLOTANTE, VariableType.ENTERO),
+    (VariableType.ENTERO, NumericOperator.IGUALDAD, VariableType.FLOTANTE, VariableType.ENTERO),
+    (VariableType.ENTERO, NumericOperator.ASIGNACION, VariableType.FLOTANTE, None),
+    (VariableType.ENTERO, NumericOperator.ASIGNACION, VariableType.ENTERO, VariableType.ENTERO),
 ])
-def test_get_result_type(cube: SemanticCube, type_1: PatitoType, oper: PatitoOperator, type_2: PatitoType, result_type: PatitoType | None) -> None:
+def test_get_result_type(cube: SemanticCube, type_1: VariableType, oper: NumericOperator, type_2: VariableType, result_type: VariableType | None) -> None:
     assert cube.get_result_type(oper, type_1, type_2) == result_type

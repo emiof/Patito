@@ -1,99 +1,85 @@
 from ..syntax import PatitoListener, PatitoParser
-from ..semantics import SymbolsTable, Symbol
-from ..classifications import SymbolType, PatitoType, token_mapper
+from ..semantics import SymbolsTable, VariableSymbol, FunctionSymbol, symbol_exists_uphill, get_symbol_uphill
+from ..classifications import VariableType, token_mapper, Signature, SymbolType
 from ..containers import Stack, Pair
-from .tree_traversal import extract_id, extract_type, extract_expression
-from ..quadruples import ExpQuadruple, ExpQuadrupleBuilder, FlowQuadruple, OperandPair
+from .tree_traversal import extract_id, extract_type, extract_expression, extract_signature
+from ..quadruples import ExpQuadruple, ExpQuadrupleBuilder, FlowQuadruple, OperandPair, MemoryQuadruple, AddressDispatcher
 from ..exceptions import SemanticError
 
 class PatitoSemanticListener(PatitoListener):
     def __init__(self):
         # symbol tables 
-        self.root_table = SymbolsTable("global")
+        self.root_table = SymbolsTable(table_id="global")
         self.curr_table: SymbolsTable = self.root_table
-
         # stacks
-        self.id_stack: Stack[Symbol] = Stack()
-        self.function_param_stack: Stack[PatitoType] = Stack()
-        # flags
-        self.in_param_list: bool = False
+        self.variable_stack: Stack[VariableSymbol] = Stack()
         # quadruples
         self.quadruples: list[ExpQuadruple | FlowQuadruple] = []
+        self.memory_quadruples: list[MemoryQuadruple] = []
+        # address dispatcher
+        self.address_dispatcher: AddressDispatcher = AddressDispatcher()
 
     def enterFunc(self, ctx: PatitoParser.FuncContext) -> None:
         # Entering function declaration 
         func_name: str = extract_id(ctx)
-        func_symbol: Symbol = Symbol(id=func_name, symbol_type=SymbolType.FUNCTION, is_initialized=True)
-        self.curr_table.add_symbol(func_symbol)
+        func_signature: Signature = extract_signature(ctx.opc_lista_id_tipo())
+        function: FunctionSymbol = FunctionSymbol(function_id=func_name, signature=func_signature, parent_table=self.curr_table)
 
-        self.curr_table = func_symbol.table
+        self.curr_table.add_symbol(function)
+        self.curr_table = function.table
 
     def exitFunc(self, ctx: PatitoParser.FuncContext) -> None:
         # Exiting function body.
-        self.curr_table = self.curr_table.parent_symbol.parent_table
-
-    def enterOpc_lista_id_tipo(self, ctx: PatitoParser.Opc_lista_id_tipoContext):
-        # Entering function parameter list.
-        self.in_param_list = True
-
-    def exitOpc_lista_id_tipo(self, ctx: PatitoParser.Opc_lista_id_tipoContext):
-        # Exiting function parameter list.
-        self.in_param_list = False
-        self.curr_table.parent_symbol.function_attrs.signature = self.function_param_stack.pop_all(as_queue=True)
+        self.curr_table = self.curr_table.parent_table
 
     def enterLista_id(self, ctx: PatitoParser.Lista_idContext):
         # Entering variable declaration.
         if ctx.getChildCount() > 0:
-            self.__push_to_id_stack(extract_id(ctx))
+            self.variable_stack.push(VariableSymbol(variable_id=extract_id(ctx), parent_table=self.curr_table))
     
     def enterLista_id_1(self, ctx: PatitoParser.Lista_idContext):
         # Entering variable declaration.
         if ctx.getChildCount() > 0:
-            self.__push_to_id_stack(extract_id(ctx))
+            self.variable_stack.push(VariableSymbol(variable_id=extract_id(ctx), parent_table=self.curr_table))
 
     def enterId_tipo(self, ctx: PatitoParser.Id_tipoContext):
         # Entering function parameter declaration.
         if ctx.getChildCount() > 0:
-            self.__push_to_id_stack(extract_id(ctx))
+            self.variable_stack.push(VariableSymbol(variable_id=extract_id(ctx), parent_table=self.curr_table))
 
     def enterTipo(self, ctx: PatitoParser.TipoContext):
         # Exiting type token.
-        type_token: str = extract_type(ctx)
-        symbol_type: PatitoType = PatitoType.to_type(type_token)
-        Symbol.set_type(self.id_stack.peek_all(as_queue=True), symbol_type)
+        variable_type: VariableType = VariableType.to_type(extract_type(ctx))
+        VariableSymbol.set_type(self.variable_stack.peek_all(as_queue=True), variable_type)
 
-        self.curr_table.add_symbols(self.id_stack.pop_all(as_queue=True))
-
-        if self.in_param_list:
-            self.function_param_stack.push(PatitoType.to_type(type_token))
+        self.curr_table.add_symbols(self.variable_stack.pop_all(as_queue=True))
 
     def enterAsigna(self, ctx: PatitoParser.AsignaContext):
         # Entering variable assignment.
-        id_token: str = extract_id(ctx)
-        if not self.__symbol_exists(id_token):
-            raise SemanticError.undeclared_symbol(id_token)
+        variable_id: str = extract_id(ctx)
+        if not symbol_exists_uphill(self.curr_table, variable_id, SymbolType.VARIABLE):
+            raise SemanticError.undeclared_symbol(variable_id)
         
     def exitAsigna(self, ctx: PatitoParser.AsignaContext):
         # Existing variable assignment.
-        assignee_symbol: Symbol = self.__get_symbol(extract_id(ctx))
-        assignee: OperandPair = Pair.to_operand_pair(assignee_symbol)
+        variable: VariableSymbol = get_symbol_uphill(self.curr_table, extract_id(ctx), SymbolType.VARIABLE)
+        assignee: OperandPair = Pair.to_operand_pair(variable)
         expression_tokens: list[str] = extract_expression(ctx)
 
         if len(expression_tokens) == 1:
             assigner: OperandPair = Pair(expression_tokens[0], token_mapper(expression_tokens[0]))
-            self.quadruples.append(ExpQuadruple.assignment(assignee, assigner))
         else:
-            self.quadruples += ExpQuadrupleBuilder(expression_tokens, self.root_table.get_variables(), self.curr_table.get_variables()).build_quadruples()
-            assignment_quadr = ExpQuadruple.assignment(assignee, self.quadruples[-1].result)
-            self.quadruples.append(assignment_quadr)
+            self.quadruples += ExpQuadrupleBuilder(expression_tokens, self.curr_table).build_quadruples()
+            assigner: OperandPair = self.quadruples[-1].result
 
-        assignee_symbol.is_initialized = True
+        self.quadruples.append(ExpQuadruple.assignment(assignee, assigner))
+        variable.is_initialized = True
         
     def enterLlamada(self, ctx: PatitoParser.LlamadaContext):
         # Entering function call.
-        id_token: str = extract_id(ctx)
-        if not self.__symbol_exists(id_token):
-            raise SemanticError.undeclared_symbol(id_token)
+        function_id: str = extract_id(ctx)
+        if not symbol_exists_uphill(self.curr_table, function_id, SymbolType.FUNCTION):
+            raise SemanticError.undeclared_symbol(function_id)
         
     def enterCondicion(self, ctx: PatitoParser.CicloContext):
         # Entering if statement.
@@ -101,10 +87,11 @@ class PatitoSemanticListener(PatitoListener):
 
         if len(expression_tokens) == 1:
             operand: OperandPair = Pair(expression_tokens[0], token_mapper(expression_tokens[0]))
-            self.quadruples.append(FlowQuadruple.GOTO_F_quadruple(operand))
         else:
-            self.quadruples += ExpQuadrupleBuilder(expression_tokens, self.root_table.get_variables(), self.curr_table.get_variables()).build_quadruples()
-            self.quadruples.append(FlowQuadruple.GOTO_F_quadruple(self.quadruples[-1].result))
+            self.quadruples += ExpQuadrupleBuilder(expression_tokens, self.curr_table).build_quadruples()
+            operand: OperandPair = self.quadruples[-1].result
+        
+        self.quadruples.append(FlowQuadruple.GOTO_F_quadruple(operand))
 
     def enterOpc_sino(self, ctx: PatitoParser.Opc_sinoContext):
         # Entering 'else' body of the if statement. 
@@ -116,10 +103,11 @@ class PatitoSemanticListener(PatitoListener):
 
         if len(expression_tokens) == 1:
             operand: OperandPair = Pair(expression_tokens[0], token_mapper(expression_tokens[0]))
-            self.quadruples.append(FlowQuadruple.GOTO_F_quadruple(operand))
         else:
-            self.quadruples += ExpQuadrupleBuilder(expression_tokens, self.root_table.get_variables(), self.curr_table.get_variables()).build_quadruples()
-            self.quadruples.append(FlowQuadruple.GOTO_F_quadruple(self.quadruples[-1].result))
+            self.quadruples += ExpQuadrupleBuilder(expression_tokens, self.curr_table).build_quadruples()
+            operand: OperandPair = self.quadruples[-1].result
+        
+        self.quadruples.append(FlowQuadruple.GOTO_F_quadruple(operand))
 
     def exitCiclo(self, ctx: PatitoParser.CicloContext):
         # Existing while loop.
@@ -131,13 +119,5 @@ class PatitoSemanticListener(PatitoListener):
     def getQuadruples(self) -> list[ExpQuadruple]:
         return self.quadruples
     
-    def __push_to_id_stack(self, id_token: str):
-        self.id_stack.push(Symbol(id=id_token, symbol_type=SymbolType.VARIABLE))
-    
-    def __get_symbol(self, id_token: str) -> Symbol:
-        if self.curr_table.symbol_exists(id_token):
-            return self.curr_table.get_symbol(id_token)
-        return self.root_table.get_symbol(id_token)        
-    
-    def __symbol_exists(self, id_token: str) -> bool:
-        return self.curr_table.symbol_exists(id_token) or self.root_table.symbol_exists(id_token)
+    def getMemoryQuadruples(self) -> list[MemoryQuadruple]:
+        return [self.address_dispatcher.build_quadruple(quad) for quad in self.quadruples]
