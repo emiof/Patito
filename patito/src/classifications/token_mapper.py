@@ -1,4 +1,5 @@
-from ..classifications import NumericOperator, VariableType
+from .numeric_operators import NumericOperator
+from .variable_types import VariableType
 import re
 
 entero_pattern: re.Pattern = re.compile(r"[0-9]+")
