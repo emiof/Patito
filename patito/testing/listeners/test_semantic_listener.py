@@ -3,7 +3,7 @@ from antlr4 import ParseTreeWalker
 from ..utils import build_parser
 from ...src.listeners import PatitoSemanticListener
 from ...src.semantics import SymbolsTable
-from ...src.quadruples import ExpQuadruple, MemoryQuadruple, FlowQuadruple
+from ...src.quadruples import ExpQuadruple, TrueQuadruple, FlowQuadruple
 from ...src.containers import Register
 
 programs: list[tuple[str]] = [
@@ -23,7 +23,7 @@ def test_listener(program: str) -> None:
 
     symbols_table: SymbolsTable = listener.getSymbolsTable()
     quadruples: Register[ExpQuadruple | FlowQuadruple] = listener.getQuadruples()
-    memory_quadruples: Register[MemoryQuadruple] = listener.getMemoryQuadruples()
+    memory_quadruples: Register[TrueQuadruple] = listener.getMemoryQuadruples()
 
     print("\n" + "=" * 50)
     print(symbols_table, end="\n\n")

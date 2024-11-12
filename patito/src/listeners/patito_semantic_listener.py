@@ -2,7 +2,7 @@ from ..syntax import PatitoListener, PatitoParser
 from ..semantics import SymbolsTable, VariableSymbol, FunctionSymbol, symbol_exists_uphill, get_symbol_uphill
 from ..classifications import VariableType, token_mapper, Signature, SymbolType
 from ..containers import Stack, Pair, Register
-from ..quadruples import ExpQuadruple, ExpQuadrupleBuilder, FlowQuadruple, OperandPair, MemoryQuadruple, MemoryQuadrupleBuilder
+from ..quadruples import ExpQuadruple, ExpQuadrupleBuilder, FlowQuadruple, OperandPair, TrueQuadruple, TrueQuadrupleBuilder
 from ..exceptions import SemanticError
 from .tree_traversal import extract_id, extract_type, extract_expression, extract_signature
 
@@ -15,9 +15,11 @@ class PatitoSemanticListener(PatitoListener):
         self.variable_stack: Stack[VariableSymbol] = Stack()
         # quadruples
         self.quadruples_register: Register[ExpQuadruple | FlowQuadruple] = Register()
-        self.memory_quadruples_register: Register[MemoryQuadruple] = Register()
+        self.memory_quadruples_register: Register[TrueQuadruple] = Register()
         # address dispatcher
-        self.memory_quadruple_builder: MemoryQuadrupleBuilder = MemoryQuadrupleBuilder()
+        self.true_quadruple_builder: TrueQuadrupleBuilder = TrueQuadrupleBuilder()
+        # jump resolvers 
+
 
     def enterFunc(self, ctx: PatitoParser.FuncContext) -> None:
         # Entering function declaration 
@@ -122,16 +124,16 @@ class PatitoSemanticListener(PatitoListener):
     def getSymbolsTable(self) -> SymbolsTable:
         return self.root_table
     
-    def getQuadruples(self) -> list[ExpQuadruple]:
+    def getQuadruples(self) -> Register[ExpQuadruple | FlowQuadruple]:
         return self.quadruples_register
     
-    def getMemoryQuadruples(self) -> list[MemoryQuadruple]:
+    def getMemoryQuadruples(self) -> Register[TrueQuadruple]:
         return self.memory_quadruples_register
     
     def __register_quadruple(self, quadruple: ExpQuadruple | FlowQuadruple) -> None:
         self.quadruples_register.add_record(quadruple)
-        self.memory_quadruples_register.add_record(self.memory_quadruple_builder.build_quadruple(quadruple, self.curr_table))
+        self.memory_quadruples_register.add_record(self.true_quadruple_builder.build_quadruple(quadruple, self.curr_table))
     
     def __register_quadruples_batch(self, quadruples_batch: list[ExpQuadruple, FlowQuadruple]) -> None:
         self.quadruples_register.add_records(quadruples_batch)
-        self.memory_quadruples_register.add_records(self.memory_quadruple_builder.build_quadruples(quadruples_batch, self.curr_table))
+        self.memory_quadruples_register.add_records(self.true_quadruple_builder.build_quadruples(quadruples_batch, self.curr_table))
