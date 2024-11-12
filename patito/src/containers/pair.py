@@ -1,6 +1,5 @@
 from typing import TypeVar, Generic
 from collections.abc import Iterator
-from ..semantics import VariableSymbol
 from ..classifications import VariableType, NumericOperator
 
 T1 = TypeVar('T1') 
@@ -25,10 +24,6 @@ class Pair(Generic[T1, T2]):
     @property
     def second(self) -> T2:
         return self.__second
-    
-    @staticmethod
-    def to_operand_pair(variable: VariableSymbol) -> 'Pair[str, VariableType]':
-        return Pair(variable.symbol_id, variable.variable_type)
     
 OperandPair = Pair[str, VariableType]
 OperatorPair = Pair[str, NumericOperator]

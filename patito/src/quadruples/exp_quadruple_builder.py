@@ -1,8 +1,8 @@
 from ..containers import Stack, Pair, OperatorPair, OperandPair
-from .exp_quadruple import ExpQuadruple
 from ..semantics import VariableSymbol, SymbolsTable, symbol_exists_uphill, get_symbol_uphill
 from ..classifications import token_mapper, VariableType, NumericOperator, SymbolType
 from ..exceptions import SemanticError
+from .exp_quadruple import ExpQuadruple
 
 class ExpQuadrupleBuilder:
     def __init__(self, expression: list[str], symbols_table: SymbolsTable):
@@ -60,7 +60,7 @@ class ExpQuadrupleBuilder:
             raise SemanticError.undeclared_symbol(variable_id)
         
         variable: VariableSymbol = get_symbol_uphill(self.symbols_table, variable_id, SymbolType.VARIABLE)        
-        self.operand_stack.push(Pair.to_operand_pair(variable))
+        self.operand_stack.push(VariableSymbol.to_operand_pair(variable))
         self.token_stack.pop()
 
     def __push_operator(self) -> None:

@@ -1,16 +1,13 @@
 # Python Version: 3.11.8
 
-from ..classifications import VariableType
-from ..classifications import NumericOperator
 import numpy as np
 from itertools import product
 from typing import Callable
+from ..classifications import VariableType
+from ..classifications import NumericOperator
 from .operator_strategies import *
 
 class SemanticCube:
-    """
-    
-    """
     def __init__(self):
         self.cube: np.ndarray = SemanticCube.create_cube()
 
