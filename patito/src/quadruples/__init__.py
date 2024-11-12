@@ -1,5 +1,6 @@
 from .exp_quadruple import ExpQuadruple, OperandPair, OperatorPair
 from .exp_quadruple_builder import ExpQuadrupleBuilder
 from .flow_quadruple import FlowQuadruple
-from .memory_quadruple import MemoryQuadruple
-from .memory_quadruple_builder import MemoryQuadrupleBuilder
+from .true_quadruple import TrueQuadruple
+from .true_quadruple_builder import TrueQuadrupleBuilder
+from .jump_resolver import JumpResolver
