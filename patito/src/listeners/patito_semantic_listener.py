@@ -1,7 +1,7 @@
 from ..syntax import PatitoListener, PatitoParser
 from ..semantics import SymbolsTable, VariableSymbol, FunctionSymbol, symbol_exists_uphill, get_symbol_uphill
 from ..classifications import VariableType, token_mapper, Signature, SymbolType
-from ..containers import Stack, Pair
+from ..containers import Stack, Pair, Register
 from ..quadruples import ExpQuadruple, ExpQuadrupleBuilder, FlowQuadruple, OperandPair, MemoryQuadruple, MemoryQuadrupleBuilder
 from ..exceptions import SemanticError
 from .tree_traversal import extract_id, extract_type, extract_expression, extract_signature
@@ -14,8 +14,8 @@ class PatitoSemanticListener(PatitoListener):
         # stacks
         self.variable_stack: Stack[VariableSymbol] = Stack()
         # quadruples
-        self.quadruples: list[ExpQuadruple | FlowQuadruple] = []
-        self.memory_quadruples: list[MemoryQuadruple] = []
+        self.quadruples_register: Register[ExpQuadruple | FlowQuadruple] = Register()
+        self.memory_quadruples_register: Register[MemoryQuadruple] = Register()
         # address dispatcher
         self.memory_quadruple_builder: MemoryQuadrupleBuilder = MemoryQuadrupleBuilder()
 
@@ -74,7 +74,7 @@ class PatitoSemanticListener(PatitoListener):
             assigner: OperandPair = context_quadruples[-1].result
 
         context_quadruples.append(ExpQuadruple.assignment(assignee, assigner))
-        self.__add_quadruples_batch(context_quadruples)
+        self.__register_quadruples_batch(context_quadruples)
         variable.is_initialized = True
         
     def enterLlamada(self, ctx: PatitoParser.LlamadaContext):
@@ -95,11 +95,11 @@ class PatitoSemanticListener(PatitoListener):
             operand: OperandPair = context_quadruples[-1].result
         
         context_quadruples.append(FlowQuadruple.GOTO_F_quadruple(operand))
-        self.__add_quadruples_batch(context_quadruples)
+        self.__register_quadruples_batch(context_quadruples)
 
     def enterOpc_sino(self, ctx: PatitoParser.Opc_sinoContext):
         # Entering 'else' body of the if statement. 
-        self.quadruples.append(FlowQuadruple.GOTO_quadruple())
+        self.__register_quadruple(FlowQuadruple.GOTO_quadruple())
 
     def enterCiclo(self, ctx: PatitoParser.CicloContext):
         # Entering while loop. 
@@ -113,21 +113,25 @@ class PatitoSemanticListener(PatitoListener):
             operand: OperandPair = context_quadruples[-1].result
         
         context_quadruples.append(FlowQuadruple.GOTO_F_quadruple(operand))
-        self.__add_quadruples_batch(context_quadruples)
+        self.__register_quadruples_batch(context_quadruples)
 
     def exitCiclo(self, ctx: PatitoParser.CicloContext):
         # Existing while loop.
-        self.quadruples.append(FlowQuadruple.GOTO_quadruple())
+        self.__register_quadruple(FlowQuadruple.GOTO_quadruple())
 
     def getSymbolsTable(self) -> SymbolsTable:
         return self.root_table
     
     def getQuadruples(self) -> list[ExpQuadruple]:
-        return self.quadruples
+        return self.quadruples_register
     
     def getMemoryQuadruples(self) -> list[MemoryQuadruple]:
-        return self.memory_quadruples
+        return self.memory_quadruples_register
     
-    def __add_quadruples_batch(self, quadruples_batch: list[ExpQuadruple, FlowQuadruple]) -> None:
-        self.quadruples += quadruples_batch
-        self.memory_quadruples += self.memory_quadruple_builder.build_quadruples(quadruples_batch, self.curr_table)
+    def __register_quadruple(self, quadruple: ExpQuadruple | FlowQuadruple) -> None:
+        self.quadruples_register.add_record(quadruple)
+        self.memory_quadruples_register.add_record(self.memory_quadruple_builder.build_quadruple(quadruple, self.curr_table))
+    
+    def __register_quadruples_batch(self, quadruples_batch: list[ExpQuadruple, FlowQuadruple]) -> None:
+        self.quadruples_register.add_records(quadruples_batch)
+        self.memory_quadruples_register.add_records(self.memory_quadruple_builder.build_quadruples(quadruples_batch, self.curr_table))
