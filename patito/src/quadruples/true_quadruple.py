@@ -16,3 +16,7 @@ class TrueQuadruple:
         if self.quadruple_type != QuadrupleType.FLOW:
             raise ValueError(f"attempting to add a jump action to a '{self.quadruple_type.name}' quadruple")
         self.items[-1] = jump
+
+    @staticmethod
+    def extract_flow_quadruples(quadruples: list['TrueQuadruple']) -> list['TrueQuadruple']:
+        return [quad for quad in quadruples if quad.quadruple_type == QuadrupleType.FLOW]

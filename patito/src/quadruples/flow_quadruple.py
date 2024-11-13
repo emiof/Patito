@@ -1,8 +1,9 @@
-from typing import Optional
+from typing import Optional, Union
 from collections.abc import Iterator
 from ..classifications import VariableType, FlowOperator
 from ..exceptions import SemanticError
 from ..containers import Pair, OperandPair
+from .exp_quadruple import ExpQuadruple
 
 class FlowQuadruple:
     def __init__(self, flow_operator: FlowOperator, operand: OperandPair, jump_location: Optional[int] = None):
@@ -28,3 +29,7 @@ class FlowQuadruple:
     @staticmethod
     def GOTO_quadruple() -> 'FlowQuadruple':
         return FlowQuadruple(FlowOperator.GOTO, Pair("1", VariableType.ENTERO))
+    
+    @staticmethod
+    def extract_flow_quadruples(quadruples: list[Union['FlowQuadruple', ExpQuadruple]]) -> list['FlowQuadruple']:
+        return [quad for quad in quadruples if isinstance(quad, FlowQuadruple)]

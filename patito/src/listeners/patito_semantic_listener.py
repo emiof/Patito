@@ -1,8 +1,8 @@
 from ..syntax import PatitoListener, PatitoParser
 from ..semantics import SymbolsTable, VariableSymbol, FunctionSymbol, symbol_exists_uphill, get_symbol_uphill
-from ..classifications import VariableType, token_mapper, Signature, SymbolType
+from ..classifications import VariableType, token_mapper, Signature, SymbolType, QuadrupleType
 from ..containers import Stack, Pair, Register
-from ..quadruples import ExpQuadruple, ExpQuadrupleBuilder, FlowQuadruple, OperandPair, TrueQuadruple, TrueQuadrupleBuilder
+from ..quadruples import ExpQuadruple, ExpQuadrupleBuilder, FlowQuadruple, OperandPair, TrueQuadruple, TrueQuadrupleBuilder, JumpResolver
 from ..exceptions import SemanticError
 from .tree_traversal import extract_id, extract_type, extract_expression, extract_signature
 
@@ -15,11 +15,12 @@ class PatitoSemanticListener(PatitoListener):
         self.variable_stack: Stack[VariableSymbol] = Stack()
         # quadruples
         self.quadruples_register: Register[ExpQuadruple | FlowQuadruple] = Register()
-        self.memory_quadruples_register: Register[TrueQuadruple] = Register()
+        self.true_quadruples_register: Register[TrueQuadruple] = Register()
+        # jump resolvers 
+        self.quadruple_jump_resolver: JumpResolver[FlowQuadruple] = JumpResolver()
+        self.true_quadruple_jump_resolver: JumpResolver[TrueQuadruple] = JumpResolver()
         # address dispatcher
         self.true_quadruple_builder: TrueQuadrupleBuilder = TrueQuadrupleBuilder()
-        # jump resolvers 
-
 
     def enterFunc(self, ctx: PatitoParser.FuncContext) -> None:
         # Entering function declaration 
@@ -76,7 +77,8 @@ class PatitoSemanticListener(PatitoListener):
             assigner: OperandPair = context_quadruples[-1].result
 
         context_quadruples.append(ExpQuadruple.assignment(assignee, assigner))
-        self.__register_quadruples_batch(context_quadruples)
+        self.__register_quadruples_batch(context_quadruples, self.true_quadruple_builder.build_quadruples(context_quadruples, self.curr_table))
+
         variable.is_initialized = True
         
     def enterLlamada(self, ctx: PatitoParser.LlamadaContext):
@@ -96,15 +98,27 @@ class PatitoSemanticListener(PatitoListener):
             context_quadruples += ExpQuadrupleBuilder(expression_tokens, self.curr_table).build_quadruples()
             operand: OperandPair = context_quadruples[-1].result
         
-        context_quadruples.append(FlowQuadruple.GOTO_F_quadruple(operand))
-        self.__register_quadruples_batch(context_quadruples)
+        self.__register_quadruples_batch(context_quadruples, self.true_quadruple_builder.build_quadruples(context_quadruples, self.curr_table))
+        
+        goto_f: FlowQuadruple = FlowQuadruple.GOTO_F_quadruple(operand)
+        true_goto_f: TrueQuadruple = self.true_quadruple_builder.build_quadruple(goto_f, self.curr_table)
+        self.__register_quadruple(goto_f, true_goto_f)
+        self.__poise_quadruple(goto_f, true_goto_f)
 
     def enterOpc_sino(self, ctx: PatitoParser.Opc_sinoContext):
-        # Entering 'else' body of the if statement. 
-        self.__register_quadruple(FlowQuadruple.GOTO_quadruple())
+        # Entering 'else' body of the if statement, or end of the if statement if 'else' body isn't present. 
+        goto: FlowQuadruple = FlowQuadruple.GOTO_quadruple()
+        true_goto: TrueQuadruple = self.true_quadruple_builder.build_quadruple(goto, self.curr_table)
+        self.__register_quadruple(goto, true_goto)
+        self.__resolve_quadruple(self.__get_next_record_index())
+        self.__poise_quadruple(goto, true_goto)
+
+    def exitOpc_sino(self, ctx: PatitoParser.Opc_sinoContext):
+        self.__resolve_quadruple(self.__get_next_record_index())
 
     def enterCiclo(self, ctx: PatitoParser.CicloContext):
         # Entering while loop. 
+        self.__poise_jump(self.__get_next_record_index())
         expression_tokens: list[str] = extract_expression(ctx)
         context_quadruples: list[ExpQuadruple | FlowQuadruple] = []
 
@@ -113,13 +127,21 @@ class PatitoSemanticListener(PatitoListener):
         else:
             context_quadruples += ExpQuadrupleBuilder(expression_tokens, self.curr_table).build_quadruples()
             operand: OperandPair = context_quadruples[-1].result
+
+        self.__register_quadruples_batch(context_quadruples, self.true_quadruple_builder.build_quadruples(context_quadruples, self.curr_table))
         
-        context_quadruples.append(FlowQuadruple.GOTO_F_quadruple(operand))
-        self.__register_quadruples_batch(context_quadruples)
+        goto: FlowQuadruple = FlowQuadruple.GOTO_F_quadruple(operand)
+        true_goto: TrueQuadruple = self.true_quadruple_builder.build_quadruple(goto, self.curr_table)
+        self.__register_quadruple(goto, true_goto)
+        self.__poise_quadruple(goto, true_goto)
 
     def exitCiclo(self, ctx: PatitoParser.CicloContext):
         # Existing while loop.
-        self.__register_quadruple(FlowQuadruple.GOTO_quadruple())
+        goto: FlowQuadruple = FlowQuadruple.GOTO_quadruple()
+        true_goto: TrueQuadruple = self.true_quadruple_builder.build_quadruple(goto, self.curr_table)
+        self.__register_quadruple(goto, true_goto)
+        self.__resolve_jump(goto, true_goto)
+        self.__resolve_quadruple(self.__get_next_record_index())
 
     def getSymbolsTable(self) -> SymbolsTable:
         return self.root_table
@@ -128,12 +150,35 @@ class PatitoSemanticListener(PatitoListener):
         return self.quadruples_register
     
     def getMemoryQuadruples(self) -> Register[TrueQuadruple]:
-        return self.memory_quadruples_register
+        return self.true_quadruples_register
     
-    def __register_quadruple(self, quadruple: ExpQuadruple | FlowQuadruple) -> None:
+    def __get_next_record_index(self) -> int:
+        if self.quadruples_register.next_record_index != self.true_quadruples_register.next_record_index:
+            raise Exception("quadruple registers have become desynchronized")
+        return self.quadruples_register.next_record_index
+    
+    def __poise_quadruple(self, quadruple: FlowQuadruple, true_quadruple: TrueQuadruple) -> None:
+        self.quadruple_jump_resolver.poise_quadruple(quadruple)
+        self.true_quadruple_jump_resolver.poise_quadruple(true_quadruple)
+
+    def __poise_jump(self, jump: int) -> None:
+        self.quadruple_jump_resolver.poise_jump(jump)
+        self.true_quadruple_jump_resolver.poise_jump(jump)
+
+    def __resolve_jump(self, quadruple: FlowQuadruple, true_quadruple: TrueQuadruple) -> None:
+        self.quadruple_jump_resolver.resolve_jump(quadruple)
+        self.true_quadruple_jump_resolver.resolve_jump(true_quadruple)
+
+    def __resolve_quadruple(self, jump: int) -> None:
+        self.quadruple_jump_resolver.resolve_quadruple(jump)
+        self.true_quadruple_jump_resolver.resolve_quadruple(jump)
+
+    def __register_quadruple(self, quadruple: ExpQuadruple | FlowQuadruple, true_quadruple: TrueQuadruple) -> None:
         self.quadruples_register.add_record(quadruple)
-        self.memory_quadruples_register.add_record(self.true_quadruple_builder.build_quadruple(quadruple, self.curr_table))
+        self.true_quadruples_register.add_record(true_quadruple)
     
-    def __register_quadruples_batch(self, quadruples_batch: list[ExpQuadruple, FlowQuadruple]) -> None:
+    def __register_quadruples_batch(self, quadruples_batch: list[ExpQuadruple, FlowQuadruple], true_quadruples_batch: list[TrueQuadruple]) -> None:
+        if len(quadruples_batch) != len(true_quadruples_batch):
+            raise ValueError("providing batches of different sizes")
         self.quadruples_register.add_records(quadruples_batch)
-        self.memory_quadruples_register.add_records(self.true_quadruple_builder.build_quadruples(quadruples_batch, self.curr_table))
+        self.true_quadruples_register.add_records(true_quadruples_batch)
