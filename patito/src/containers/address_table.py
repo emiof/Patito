@@ -6,6 +6,12 @@ class AddressTable:
         self.max_size: int = size
         self.address_table: dict[str, int] = {}
 
+    def get_real_range(self) -> tuple[int, int]:
+        return (self.curr_slot - self.n, self.curr_slot)
+
+    def get_size(self) -> int:
+        return self.n
+
     def get_address(self, token: str) -> int:
         if token in self.address_table:
             return self.address_table[token]

@@ -1,21 +1,16 @@
 from typing import Optional, Union
-from collections.abc import Iterator
 from ..classifications import VariableType, FlowOperator
 from ..exceptions import SemanticError
 from ..containers import Pair, OperandPair
 from .exp_quadruple import ExpQuadruple
+from .utils import examinable
 
+@examinable
 class FlowQuadruple:
     def __init__(self, flow_operator: FlowOperator, operand: OperandPair, jump_location: Optional[int] = None):
         if operand.second != VariableType.ENTERO:
             raise SemanticError.expected_boolean(operand.first)
         self.items: list[FlowOperator, OperandPair, None, Optional[int]] = [flow_operator, operand, None, jump_location]
-
-    def __str__(self) -> str:
-        return "(" + " ".join(item.__str__() for item in self.items) + ")"
-    
-    def __iter__(self) -> Iterator[FlowOperator | OperandPair | None | int]:
-        yield from self.items
 
     def set_jump(self, jump: int) -> None:
         if self.items[-1] is not None:
