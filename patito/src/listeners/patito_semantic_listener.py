@@ -45,9 +45,9 @@ class PatitoSemanticListener(PatitoListener):
     def exitFunc(self, ctx: PatitoParser.FuncContext) -> None:
         # Exiting function body.
         self.curr_table = self.curr_table.parent_table
-        ENDFUNC_quadruple: FuncQuadruple = FuncQuadruple.ENDFUNC_quadruple()
-        true_ENDFUNC_quadruple: TrueQuadruple = self.true_quadruple_builder.build_quadruple(ENDFUNC_quadruple, self.curr_table)
-        self.__register_quadruple(ENDFUNC_quadruple, true_ENDFUNC_quadruple)
+        endfunc_quadruple: FuncQuadruple = FuncQuadruple.ENDFUNC_quadruple()
+        true_endfunc_quadruple: TrueQuadruple = self.true_quadruple_builder.build_quadruple(endfunc_quadruple, self.curr_table)
+        self.__register_quadruple(endfunc_quadruple, true_endfunc_quadruple)
 
     def enterLista_id(self, ctx: PatitoParser.Lista_idContext):
         # Entering variable declaration.
@@ -62,10 +62,10 @@ class PatitoSemanticListener(PatitoListener):
     def enterId_tipo(self, ctx: PatitoParser.Id_tipoContext):
         # Entering function parameter declaration.
         if ctx.getChildCount() > 0:
-            self.variable_stack.push(VariableSymbol(variable_id=extract_id(ctx), parent_table=self.curr_table))
+            self.variable_stack.push(VariableSymbol(variable_id=extract_id(ctx), parent_table=self.curr_table, is_initialized=True))
 
     def enterTipo(self, ctx: PatitoParser.TipoContext):
-        # Exiting type token.
+        # Exiting variable type token.
         variable_type: VariableType = VariableType.to_type(extract_type(ctx))
         VariableSymbol.set_type(self.variable_stack.peek_all(as_queue=True), variable_type)
 
@@ -97,12 +97,16 @@ class PatitoSemanticListener(PatitoListener):
         
     def exitLlamada(self, ctx: PatitoParser.LlamadaContext):
         function_symbol: FunctionSymbol = get_symbol_uphill(self.curr_table, extract_id(ctx), SymbolType.FUNCTION)
+        provided_signature: Signature = []
         # param 
         for argument_expression in extract_expression_list(ctx.opc_lista_expresion()):
             operand: OperandPair = self.__process_expresion(extract_expression(argument_expression))
+            provided_signature.append(operand.second)
             param_quadruple: FuncQuadruple = FuncQuadruple.PARAM_quadruple(operand)
             true_param_quadruple: TrueQuadruple = self.true_quadruple_builder.build_quadruple(param_quadruple, self.curr_table)
             self.__register_quadruple(param_quadruple, true_param_quadruple)
+
+        self.__validate_function_signature(provided_signature, function_symbol.signature, function_symbol.symbol_id)
         
         # era
         era_quadruple: FuncQuadruple = FuncQuadruple.ERA_quadruple(function_symbol.symbol_id)
@@ -218,3 +222,11 @@ class PatitoSemanticListener(PatitoListener):
             raise ValueError("providing batches of different sizes")
         self.quadruples_register.add_records(quadruples_batch)
         self.true_quadruples_register.add_records(true_quadruples_batch)
+
+    def __validate_function_signature(self, provided_signature: Signature, expected_signature: Signature, function_id: str) -> None:
+        if len(provided_signature) != len(expected_signature):
+            raise SemanticError.arity_mismatch(function_id, len(provided_signature), len(expected_signature))
+        
+        for provided_param_type, expected_param_type in zip(provided_signature, expected_signature):
+            if provided_param_type != expected_param_type:
+                raise SemanticError.type_mismatch(provided_param_type, expected_param_type)

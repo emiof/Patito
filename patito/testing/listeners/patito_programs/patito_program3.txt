@@ -2,18 +2,13 @@ programa programa3;
 
 var k: entero; 
 
-nula factorial(k: entero){
-    var producto: entero;
-
-    {
-        producto = 1;
-        
-        mientras (k > 0) haz {
-            producto = producto * k;
-            k = k - 1;
-        }; 
-
-        escribe(producto);
+nula factorial(k: entero, producto: entero){
+    {   
+        si (k == 0){
+            escribe(producto); 
+        } sino {
+            factorial(k-1, producto * k);
+        };  
     }
 };
 
@@ -39,9 +34,9 @@ nula resta(a: entero, b: entero){
 };
 
 inicio {
-    k = 1;
+    k = 1; 
     
-    factorial(k + 2);
+    factorial(k + 3, 1);
     suma(5);
     resta(0, 10);
 }
