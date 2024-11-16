@@ -1,8 +1,9 @@
+from typing import Optional
 from ..syntax import PatitoListener, PatitoParser
 from ..semantics import SymbolsTable, VariableSymbol, FunctionSymbol, symbol_exists_uphill, get_symbol_uphill, build_memory_requiremnts_downhill
-from ..classifications import VariableType, token_mapper, Signature, SymbolType, QuadrupleType
+from ..classifications import VariableType, token_mapper, Signature, SymbolType
 from ..containers import Stack, Pair, Register
-from ..quadruples import ExpQuadruple, ExpQuadrupleBuilder, FlowQuadruple, OperandPair, TrueQuadruple, TrueQuadrupleBuilder, JumpResolver
+from ..quadruples import ExpQuadruple, ExpQuadrupleBuilder, FlowQuadruple, OperandPair, TrueQuadruple, TrueQuadrupleBuilder, JumpResolver, StmtQuadruple
 from ..exceptions import SemanticError
 from ..virtual_machine import MemoryRequirements
 from .tree_traversal import extract_id, extract_type, extract_expression, extract_signature
@@ -15,7 +16,7 @@ class PatitoSemanticListener(PatitoListener):
         # stacks
         self.variable_stack: Stack[VariableSymbol] = Stack()
         # quadruples
-        self.quadruples_register: Register[ExpQuadruple | FlowQuadruple] = Register()
+        self.quadruples_register: Register[ExpQuadruple | FlowQuadruple | StmtQuadruple] = Register()
         self.true_quadruples_register: Register[TrueQuadruple] = Register()
         # jump resolvers 
         self.quadruple_jump_resolver: JumpResolver[FlowQuadruple] = JumpResolver()
@@ -144,6 +145,17 @@ class PatitoSemanticListener(PatitoListener):
         self.__resolve_jump(goto, true_goto)
         self.__resolve_quadruple(self.__get_next_record_index())
 
+    def exitExpresion_o_letrero(self, ctx: PatitoParser.Expresion_o_letreroContext):
+        # Entering an argument of an 'imprime' statement.
+        if ctx.LETRERO() is not None:
+            operand: OperandPair = Pair(ctx.LETRERO().getText(), VariableType.LETRERO)
+        else:
+            operand: OperandPair = self.__process_expresion(extract_expression(ctx))
+
+        print_quadruple: StmtQuadruple = StmtQuadruple.print(operand)
+        true_print_quadruple: TrueQuadruple = self.true_quadruple_builder.build_quadruple(print_quadruple, self.curr_table)
+        self.__register_quadruple(print_quadruple, true_print_quadruple)
+
     def get_symbols_table(self) -> SymbolsTable:
         return self.root_table
     
@@ -158,6 +170,15 @@ class PatitoSemanticListener(PatitoListener):
     
     def get_all_memory_requirements(self) -> dict[str, MemoryRequirements]:
         return build_memory_requiremnts_downhill(self.root_table)
+    
+    def __process_expresion(self, expression_tokens: list[str]) -> Pair:
+        if len(expression_tokens) == 1:
+            return Pair(expression_tokens[0], token_mapper(expression_tokens[0]))
+        
+        *quadruples, final_quadruple = ExpQuadrupleBuilder(expression_tokens, self.curr_table).build_quadruples()
+        self.__register_quadruples_batch([*quadruples, final_quadruple], self.true_quadruple_builder.build_quadruples([*quadruples, final_quadruple], self.curr_table))
+
+        return final_quadruple.result
     
     def __get_next_record_index(self) -> int:
         if self.quadruples_register.next_record_index != self.true_quadruples_register.next_record_index:
@@ -180,11 +201,11 @@ class PatitoSemanticListener(PatitoListener):
         self.quadruple_jump_resolver.resolve_quadruple(jump)
         self.true_quadruple_jump_resolver.resolve_quadruple(jump)
 
-    def __register_quadruple(self, quadruple: ExpQuadruple | FlowQuadruple, true_quadruple: TrueQuadruple) -> None:
+    def __register_quadruple(self, quadruple: ExpQuadruple | FlowQuadruple | StmtQuadruple, true_quadruple: TrueQuadruple) -> None:
         self.quadruples_register.add_record(quadruple)
         self.true_quadruples_register.add_record(true_quadruple)
     
-    def __register_quadruples_batch(self, quadruples_batch: list[ExpQuadruple, FlowQuadruple], true_quadruples_batch: list[TrueQuadruple]) -> None:
+    def __register_quadruples_batch(self, quadruples_batch: list[ExpQuadruple | FlowQuadruple], true_quadruples_batch: list[TrueQuadruple]) -> None:
         if len(quadruples_batch) != len(true_quadruples_batch):
             raise ValueError("providing batches of different sizes")
         self.quadruples_register.add_records(quadruples_batch)

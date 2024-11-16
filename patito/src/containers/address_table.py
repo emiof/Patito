@@ -7,7 +7,7 @@ class AddressTable:
         self.address_table: dict[str, int] = {}
 
     def get_real_range(self) -> tuple[int, int]:
-        return (self.curr_slot - self.n, self.curr_slot)
+        return (self.curr_slot - self.n, self.curr_slot - 1 if self.n > 0 else self.curr_slot)
 
     def get_size(self) -> int:
         return self.n

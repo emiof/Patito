@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
+from itertools import count
 
 @dataclass
 class MemoryRequirements:
@@ -38,4 +39,10 @@ class Memory:
     def __within_range(self, address: int, address_range: tuple[int, int]) -> bool:
         lower_bound, upper_bound = address_range
         return lower_bound <= address <= upper_bound
-        
+    
+    def __str__(self) -> str:
+        int_base, float_base = self.requirements.int_range[0], self.requirements.float_range[0]
+        return (
+            "INTEGERS/ " + " | ".join(f"{address}: {val}" for address, val in zip(count(int_base), self.int_section)) +
+            "\nFLOATS/ " + " | ".join(f"{address}: {val}" for address, val in zip(count(float_base), self.float_section))
+        )
