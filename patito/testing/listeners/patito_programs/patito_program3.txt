@@ -1,14 +1,21 @@
 programa programa3;
 
-var x: entero;
+var x: entero; producto: flotante;
 
 inicio {
-    x = 0;
-
-    mientras (x < 10) haz {
-        x = x + 1;
-        escribe(x);
+    x = 1 + 1 + 1 + 1;
+    producto = 1.0;
+    
+    mientras (x > 0) haz {
+        producto = producto * x;
+        x = x - 1;
     }; 
+
+    si (0 + 1 * 0) {
+        escribe("hola"); 
+    }; 
+
+    escribe(producto);
 }
 
 fin

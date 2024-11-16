@@ -1,4 +1,3 @@
-from typing import Optional
 from ..syntax import PatitoListener, PatitoParser
 from ..semantics import SymbolsTable, VariableSymbol, FunctionSymbol, symbol_exists_uphill, get_symbol_uphill, build_memory_requiremnts_downhill
 from ..classifications import VariableType, token_mapper, Signature, SymbolType
@@ -69,18 +68,12 @@ class PatitoSemanticListener(PatitoListener):
         # Existing variable assignment.
         variable: VariableSymbol = get_symbol_uphill(self.curr_table, extract_id(ctx), SymbolType.VARIABLE)
         assignee: OperandPair = VariableSymbol.to_operand_pair(variable)
-        expression_tokens: list[str] = extract_expression(ctx)
-        context_quadruples: list[ExpQuadruple | FlowQuadruple] = []
 
-        if len(expression_tokens) == 1:
-            assigner: OperandPair = Pair(expression_tokens[0], token_mapper(expression_tokens[0]))
-        else:
-            context_quadruples += ExpQuadrupleBuilder(expression_tokens, self.curr_table).build_quadruples()
-            assigner: OperandPair = context_quadruples[-1].result
+        assigner: OperandPair = self.__process_expresion(extract_expression(ctx))
 
-        context_quadruples.append(ExpQuadruple.assignment(assignee, assigner))
-        self.__register_quadruples_batch(context_quadruples, self.true_quadruple_builder.build_quadruples(context_quadruples, self.curr_table))
-
+        context_quadruple: ExpQuadruple = ExpQuadruple.assignment(assignee, assigner)
+        true_context_quadruple: TrueQuadruple = self.true_quadruple_builder.build_quadruple(context_quadruple, self.curr_table)
+        self.__register_quadruple(context_quadruple, true_context_quadruple)
         variable.is_initialized = True
         
     def enterLlamada(self, ctx: PatitoParser.LlamadaContext):
@@ -91,16 +84,7 @@ class PatitoSemanticListener(PatitoListener):
         
     def enterCondicion(self, ctx: PatitoParser.CicloContext):
         # Entering if statement.
-        expression_tokens: list[str] = extract_expression(ctx)
-        context_quadruples: list[ExpQuadruple | FlowQuadruple] = []
-
-        if len(expression_tokens) == 1:
-            operand: OperandPair = Pair(expression_tokens[0], token_mapper(expression_tokens[0]))
-        else:
-            context_quadruples += ExpQuadrupleBuilder(expression_tokens, self.curr_table).build_quadruples()
-            operand: OperandPair = context_quadruples[-1].result
-        
-        self.__register_quadruples_batch(context_quadruples, self.true_quadruple_builder.build_quadruples(context_quadruples, self.curr_table))
+        operand: OperandPair = self.__process_expresion(extract_expression(ctx))
         
         goto_f: FlowQuadruple = FlowQuadruple.GOTO_F_quadruple(operand)
         true_goto_f: TrueQuadruple = self.true_quadruple_builder.build_quadruple(goto_f, self.curr_table)
@@ -121,17 +105,9 @@ class PatitoSemanticListener(PatitoListener):
     def enterCiclo(self, ctx: PatitoParser.CicloContext):
         # Entering while loop. 
         self.__poise_jump(self.__get_next_record_index())
-        expression_tokens: list[str] = extract_expression(ctx)
-        context_quadruples: list[ExpQuadruple | FlowQuadruple] = []
 
-        if len(expression_tokens) == 1:
-            operand: OperandPair = Pair(expression_tokens[0], token_mapper(expression_tokens[0]))
-        else:
-            context_quadruples += ExpQuadrupleBuilder(expression_tokens, self.curr_table).build_quadruples()
-            operand: OperandPair = context_quadruples[-1].result
+        operand: OperandPair = self.__process_expresion(extract_expression(ctx))
 
-        self.__register_quadruples_batch(context_quadruples, self.true_quadruple_builder.build_quadruples(context_quadruples, self.curr_table))
-        
         goto: FlowQuadruple = FlowQuadruple.GOTO_F_quadruple(operand)
         true_goto: TrueQuadruple = self.true_quadruple_builder.build_quadruple(goto, self.curr_table)
         self.__register_quadruple(goto, true_goto)
@@ -171,7 +147,7 @@ class PatitoSemanticListener(PatitoListener):
     def get_all_memory_requirements(self) -> dict[str, MemoryRequirements]:
         return build_memory_requiremnts_downhill(self.root_table)
     
-    def __process_expresion(self, expression_tokens: list[str]) -> Pair:
+    def __process_expresion(self, expression_tokens: list[str]) -> OperandPair:
         if len(expression_tokens) == 1:
             return Pair(expression_tokens[0], token_mapper(expression_tokens[0]))
         

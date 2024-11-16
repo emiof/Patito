@@ -1,6 +1,7 @@
 from ..classifications import SymbolType
 from ..virtual_machine import MemoryRequirements
-from .symbols_table import SymbolsTable, VariableSymbol
+from .symbols_table import SymbolsTable
+from .symbol import VariableSymbol
 
 def symbol_exists_uphill(curr_table: SymbolsTable, symbol_id: str, symbol_type: SymbolType) -> bool:
     if curr_table.symbol_exists(symbol_id, symbol_type):
