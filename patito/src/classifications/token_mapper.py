@@ -4,6 +4,7 @@ import re
 
 entero_pattern: re.Pattern = re.compile(r"[0-9]+")
 flotante_pattern: re.Pattern = re.compile(r"[0-9]+\.[0-9]+")
+letrero_pattern: re.Pattern = re.compile(r"(?:'[a-zA-Z0-9_\",;.: ]*')|(?:\"[a-zA-Z0-9_',;.: ]*\")")
 
 def token_mapper(token: str) -> NumericOperator | VariableType | None:
     match token:
@@ -29,6 +30,6 @@ def token_mapper(token: str) -> NumericOperator | VariableType | None:
             return VariableType.ENTERO
         case _ if flotante_pattern.fullmatch(token):
             return VariableType.FLOTANTE
-        case _:
-            return None
+        case _ if letrero_pattern.fullmatch(token):
+            return VariableType.LETRERO
 

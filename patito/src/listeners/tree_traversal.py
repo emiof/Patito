@@ -1,3 +1,4 @@
+from typing import Any
 from antlr4 import TerminalNode
 from ..classifications import Signature, VariableType
 from ..syntax import PatitoParser
@@ -28,7 +29,7 @@ def flatten_tree(ctx: any) -> list[str]:
         else:
             tokens += flatten_tree(child)
 
-    return tokens
+    return tokens    
 
 
 

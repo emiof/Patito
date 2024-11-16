@@ -3,15 +3,12 @@ programa programa3;
 var x: entero;
 
 inicio {
-    x = 1;
+    x = 0;
 
-    mientras (x < 5) haz {
+    mientras (x < 10) haz {
         x = x + 1;
+        escribe(x);
     }; 
-
-    si (5 == 4) {
-        x = 10;
-    };
 }
 
 fin

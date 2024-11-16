@@ -32,21 +32,21 @@ class TrueQuadrupleBuilder:
 
     def __build_quadruple_exp(self, exp_quadruple: ExpQuadruple) -> TrueQuadruple:
         operator, *operands = exp_quadruple
-        quad_items: list[int] = [self.__numeric_operator_to_code(operator.second)] + [self.__operand_to_address(operand) for operand in operands]
+        quad_items: list[int] = [operator.second.value] + [self.__operand_to_address(operand) for operand in operands]
         return TrueQuadruple(quad_items, QuadrupleType.EXP)
     
     def __build_quadruple_flow(self, flow_quadruple: FlowQuadruple) -> TrueQuadruple:
         operator, operand, _, jump  = flow_quadruple
-        quad_items: list[int] = [self.__flow_operator_to_code(operator), self.__operand_to_address(operand), -1, jump]
+        quad_items: list[int] = [operator.value, self.__operand_to_address(operand), -1, jump]
         return TrueQuadruple(quad_items, quadruple_type=QuadrupleType.FLOW)
     
     def __build_quadruple_stmt(self, stmt_quadruple: StmtQuadruple) -> TrueQuadruple:
         operator, operand, _, _ = stmt_quadruple
-        return TrueQuadruple([operator.value, operand, -1, -1], QuadrupleType.STMT)
+        return TrueQuadruple([operator.value, self.__operand_to_address(operand), -1, -1], QuadrupleType.STMT)
     
     def __is_constant(self, token: str) -> bool:
         token_type: NumericOperator | VariableType | None = token_mapper(token)
-        return token_type == VariableType.FLOTANTE or token_type == VariableType.ENTERO
+        return isinstance(token_type, VariableType)
     
     def __operand_to_address(self, operand: Optional[OperandPair]) -> int:
         if operand is None:
@@ -62,9 +62,3 @@ class TrueQuadrupleBuilder:
                 return get_symbol_uphill(self.symbols_table, token, SymbolType.VARIABLE).address
             else:
                 return self.symbols_table.get_temporary_address(operand)
-
-    def __numeric_operator_to_code(self, num_operator: NumericOperator) -> int:
-        return num_operator.value
-
-    def __flow_operator_to_code(self, flow_oprerator: FlowOperator) -> int:
-        return flow_oprerator.value

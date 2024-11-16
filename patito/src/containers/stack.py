@@ -43,7 +43,7 @@ class Stack(Generic[T]):
         return len(self.stack)
     
     def first(self) -> T:
-        if len(self.stack):
+        if len(self.stack) == 0:
             raise IndexError("empty stack")
         
         return self.stack[0]

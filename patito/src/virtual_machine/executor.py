@@ -12,11 +12,12 @@ class Executor:
         self.quadruples: list['TrueQuadruple'] = quadruples
         self.constants: dict[int, int | float | str] = constants
         self.memory_stack: Stack[Memory] = Stack([Memory(function_requirements['global'])])
-        print(function_requirements)
-        print(constants)
     
     def run(self) -> None:
         self.__process_quadrurple(curr_quadurple_index=0)
+
+    def get_global_memory(self) -> Memory:
+        return self.memory_stack.first()
 
     def __process_quadrurple(self, curr_quadurple_index: int) -> None:
         if curr_quadurple_index == len(self.quadruples):
@@ -63,7 +64,7 @@ class Executor:
     def __handle_stmt_quadruple(self, stmt_quadruple: 'TrueQuadruple', curr_quadruple_index: int) -> int:
         match stmt_operator(stmt_quadruple.operator):
             case StmtOperator.IMPRIME:
-                print(stmt_quadruple.operands[0])
+                print(self.__get_from_memory(address=stmt_quadruple.operands[0]))
                 return curr_quadruple_index + 1
             
     def __get_from_memory(self, *, address: int) -> int | float | str:

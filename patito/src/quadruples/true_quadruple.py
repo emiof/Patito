@@ -19,8 +19,6 @@ class TrueQuadruple:
     
     @property
     def operands(self) -> tuple[int, int]:
-        if self.quadruple_type != QuadrupleType.EXP:
-            raise ValueError(f"attempting to access operands of a '{self.quadruple_type.name}' quadruple")
         return [self.items[1], self.items[2]]
     
     @property
