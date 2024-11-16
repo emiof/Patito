@@ -4,6 +4,7 @@ from typing import Optional
 from ..exceptions import SemanticError
 from ..classifications import Signature, SymbolType, VariableType
 from ..containers import AddressTable, OperandPair, Pair
+from ..virtual_machine import MemoryRequirements
 
 class Symbol:
     def __init__(self, *, symbol_id: str, symbol_type: SymbolType, parent_table: 'SymbolsTable'):
@@ -129,6 +130,9 @@ class SymbolsTable:
                 return self.floats_table.get_address(token)
             case _:
                 raise ValueError(f"Operand with token {token} has no variable type")
+            
+    def build_memory_requirements(self) -> MemoryRequirements:
+        return MemoryRequirements(self.integers_table.get_real_range(), self.floats_table.get_real_range()) 
     
     def __set_variable_symbol_address(self, symbol: VariableSymbol) -> None:
         match symbol.variable_type:

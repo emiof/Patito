@@ -42,6 +42,12 @@ class Stack(Generic[T]):
     def size(self) -> int:
         return len(self.stack)
     
+    def first(self) -> T:
+        if len(self.stack):
+            raise IndexError("empty stack")
+        
+        return self.stack[0]
+    
     def __str__(self) -> str:
         return ", ".join([item.__str__() for item in self.stack])
     

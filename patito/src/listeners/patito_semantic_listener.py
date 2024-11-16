@@ -1,9 +1,10 @@
 from ..syntax import PatitoListener, PatitoParser
-from ..semantics import SymbolsTable, VariableSymbol, FunctionSymbol, symbol_exists_uphill, get_symbol_uphill
+from ..semantics import SymbolsTable, VariableSymbol, FunctionSymbol, symbol_exists_uphill, get_symbol_uphill, build_memory_requiremnts_downhill
 from ..classifications import VariableType, token_mapper, Signature, SymbolType, QuadrupleType
 from ..containers import Stack, Pair, Register
 from ..quadruples import ExpQuadruple, ExpQuadrupleBuilder, FlowQuadruple, OperandPair, TrueQuadruple, TrueQuadrupleBuilder, JumpResolver
 from ..exceptions import SemanticError
+from ..virtual_machine import MemoryRequirements
 from .tree_traversal import extract_id, extract_type, extract_expression, extract_signature
 
 class PatitoSemanticListener(PatitoListener):
@@ -143,14 +144,20 @@ class PatitoSemanticListener(PatitoListener):
         self.__resolve_jump(goto, true_goto)
         self.__resolve_quadruple(self.__get_next_record_index())
 
-    def getSymbolsTable(self) -> SymbolsTable:
+    def get_symbols_table(self) -> SymbolsTable:
         return self.root_table
     
-    def getQuadruples(self) -> Register[ExpQuadruple | FlowQuadruple]:
+    def get_quadruples(self) -> Register[ExpQuadruple | FlowQuadruple]:
         return self.quadruples_register
     
-    def getMemoryQuadruples(self) -> Register[TrueQuadruple]:
+    def get_true_quadruples(self) -> Register[TrueQuadruple]:
         return self.true_quadruples_register
+    
+    def get_constants_storage(self) -> dict[int, int | float | str]:
+        return self.true_quadruple_builder.get_constants_storage()
+    
+    def get_all_memory_requirements(self) -> dict[str, MemoryRequirements]:
+        return build_memory_requiremnts_downhill(self.root_table)
     
     def __get_next_record_index(self) -> int:
         if self.quadruples_register.next_record_index != self.true_quadruples_register.next_record_index:

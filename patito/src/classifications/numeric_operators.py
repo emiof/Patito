@@ -28,6 +28,8 @@ class NumericOperator(Enum):
     @staticmethod
     def has_precedence(operator_1: 'NumericOperator', operator_2: 'NumericOperator') -> bool:
         return NumericOperator.precedence_level(operator_1) >= NumericOperator.precedence_level(operator_2)
+    
+NUMERIC_OPERATOR_CODES: set[int] = set([operator.value for operator in NumericOperator])
 
 
 

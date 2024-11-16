@@ -1,22 +1,16 @@
 programa programa3;
 
-var x: flotante;
-
-nula func(a: entero, b: flotante) {
-    {
-        a = 10 + 5;
-    }
-}; 
+var x: entero;
 
 inicio {
-    x = 5.5 * 2;
+    x = 1;
 
-    mientras (x + 10 != 0) haz {
-        x = 100.0; 
+    mientras (x < 5) haz {
+        x = x + 1;
     }; 
 
-    si (5 == 5) {
-        x = 10.0;
+    si (5 == 4) {
+        x = 10;
     };
 }
 
