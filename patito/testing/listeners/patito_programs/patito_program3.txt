@@ -1,21 +1,49 @@
 programa programa3;
 
-var x: entero; producto: flotante;
+var k: entero; 
+
+nula factorial(k: entero){
+    var producto: entero;
+
+    {
+        producto = 1;
+        
+        mientras (k > 0) haz {
+            producto = producto * k;
+            k = k - 1;
+        }; 
+
+        escribe(producto);
+    }
+};
+
+nula suma(k: entero){
+    var sum: entero;
+
+    {
+        sum = 0;
+        
+        mientras (k > 0) haz {
+            sum = sum + k;
+            k = k - 1;
+        }; 
+
+        escribe(sum);
+    }
+};
+
+nula resta(a: entero, b: entero){
+    {
+        escribe(a - b);
+    }
+};
 
 inicio {
-    x = 1 + 1 + 1 + 1;
-    producto = 1.0;
+    k = 1;
     
-    mientras (x > 0) haz {
-        producto = producto * x;
-        x = x - 1;
-    }; 
-
-    si (0 + 1 * 0) {
-        escribe("hola"); 
-    }; 
-
-    escribe(producto);
+    factorial(k + 2);
+    suma(5);
+    resta(0, 10);
 }
 
 fin

@@ -1,11 +1,12 @@
 from typing import Optional
-from ..classifications import NumericOperator, VariableType, token_mapper, FlowOperator, SymbolType, QuadrupleType
+from ..classifications import NumericOperator, VariableType, token_mapper, SymbolType, QuadrupleType, FuncOperator
 from ..containers import OperandPair, AddressTable
 from ..semantics import SymbolsTable, symbol_exists_uphill, get_symbol_uphill
 from .true_quadruple import TrueQuadruple
 from .exp_quadruple import ExpQuadruple
 from .flow_quadruple import FlowQuadruple
 from .stmt_quadurple import StmtQuadruple
+from .func_quadruple import FuncQuadruple
 from .utils import cast
 
 class TrueQuadrupleBuilder:
@@ -14,7 +15,7 @@ class TrueQuadrupleBuilder:
         self.constants_storage: dict[int, int | float | str] = {}
         self.symbols_table: Optional[SymbolsTable] = None
 
-    def build_quadruple(self, quadruple: ExpQuadruple | FlowQuadruple | StmtQuadruple, symbols_table: SymbolsTable) -> TrueQuadruple:
+    def build_quadruple(self, quadruple: ExpQuadruple | FlowQuadruple | StmtQuadruple | FuncQuadruple, symbols_table: SymbolsTable) -> TrueQuadruple:
         self.symbols_table = symbols_table
         match quadruple:
             case ExpQuadruple():
@@ -23,6 +24,8 @@ class TrueQuadrupleBuilder:
                 return self.__build_quadruple_flow(quadruple)
             case StmtQuadruple():
                 return self.__build_quadruple_stmt(quadruple)
+            case FuncQuadruple():
+                return self.__build_quadruple_func(quadruple)
                         
     def build_quadruples(self, quadruples: list[ExpQuadruple | FlowQuadruple], symbols_table: SymbolsTable) -> list[TrueQuadruple]:
         return [self.build_quadruple(quad, symbols_table) for quad in quadruples]
@@ -44,6 +47,17 @@ class TrueQuadrupleBuilder:
         operator, operand, _, _ = stmt_quadruple
         return TrueQuadruple([operator.value, self.__operand_to_address(operand), -1, -1], QuadrupleType.STMT)
     
+    def __build_quadruple_func(self, func_quadruple: FuncQuadruple) -> TrueQuadruple:
+        operator, operand, _, func_reference = func_quadruple
+        match operator:
+            case FuncOperator.ERA | FuncOperator.GOSUB:
+                return TrueQuadruple([operator.value, None, None, func_reference], QuadrupleType.FUNC)
+            case FuncOperator.PARAM:
+                return TrueQuadruple([operator.value, self.__operand_to_address(operand), None, None], QuadrupleType.FUNC)
+            case FuncOperator.ENDFUNC:
+                return TrueQuadruple([operator.value, None, None, None], QuadrupleType.FUNC)
+
+
     def __is_constant(self, token: str) -> bool:
         token_type: NumericOperator | VariableType | None = token_mapper(token)
         return isinstance(token_type, VariableType)

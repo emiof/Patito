@@ -6,3 +6,4 @@ from .flow_operators import FlowOperator, FLOW_OPERATOR_CODES
 from .aliases import Signature
 from .quadruple_types import QuadrupleType
 from .stmt_operators import StmtOperator, STMT_OPERATOR_CODES
+from .func_operators import FuncOperator, FUNC_OPERATOR_CODES

@@ -1,6 +1,6 @@
 from typing import Callable
 import operator as op
-from ..classifications import FlowOperator, NumericOperator, StmtOperator
+from ..classifications import FlowOperator, NumericOperator, StmtOperator, FuncOperator
 
 Numeric = float | int
 
@@ -41,5 +41,18 @@ def stmt_operator(operator_code: int) -> StmtOperator:
         case StmtOperator.IMPRIME.value:
             return StmtOperator.IMPRIME
         case _:
-            raise ValueError(f"provied an invalid flow operator code '{operator_code}'")
+            raise ValueError(f"provied an invalid stmt operator code '{operator_code}'")
+        
+def func_operator(operator_code: int) -> StmtOperator:
+    match operator_code:
+        case FuncOperator.ERA.value:
+            return FuncOperator.ERA
+        case FuncOperator.PARAM.value:
+            return FuncOperator.PARAM
+        case FuncOperator.GOSUB.value:
+            return FuncOperator.GOSUB
+        case FuncOperator.ENDFUNC.value:
+            return FuncOperator.ENDFUNC                        
+        case _:
+            raise ValueError(f"provied an invalid func operator code '{operator_code}'")
         
