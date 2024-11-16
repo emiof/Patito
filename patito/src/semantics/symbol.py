@@ -46,11 +46,12 @@ class VariableSymbol(Symbol):
         return Pair(variable.symbol_id, variable.variable_type)
     
 class FunctionSymbol(Symbol):
-    def __init__(self, function_id: str, signature: Signature, parent_table: 'SymbolsTable', is_defined: bool = True):
+    def __init__(self, function_id: str, signature: Signature, parent_table: 'SymbolsTable', index: int, is_defined: bool = True):
         super().__init__(symbol_id=function_id, symbol_type=SymbolType.FUNCTION, parent_table=parent_table)
 
-        self.is_defined: bool = is_defined
         self.signature: Signature = signature
+        self.index: int = index
+        self.is_defined: bool = is_defined
         self.table: 'SymbolsTable' = SymbolsTable(table_id=function_id, parent_function=self)
 
     def __str__(self) -> str:

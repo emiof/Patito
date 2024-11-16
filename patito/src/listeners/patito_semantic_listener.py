@@ -2,10 +2,10 @@ from ..syntax import PatitoListener, PatitoParser
 from ..semantics import SymbolsTable, VariableSymbol, FunctionSymbol, symbol_exists_uphill, get_symbol_uphill, build_memory_requiremnts_downhill
 from ..classifications import VariableType, token_mapper, Signature, SymbolType
 from ..containers import Stack, Pair, Register
-from ..quadruples import ExpQuadruple, ExpQuadrupleBuilder, FlowQuadruple, OperandPair, TrueQuadruple, TrueQuadrupleBuilder, JumpResolver, StmtQuadruple
+from ..quadruples import ExpQuadruple, ExpQuadrupleBuilder, FlowQuadruple, OperandPair, TrueQuadruple, TrueQuadrupleBuilder, JumpResolver, StmtQuadruple, FuncQuadruple
 from ..exceptions import SemanticError
 from ..virtual_machine import MemoryRequirements
-from .tree_traversal import extract_id, extract_type, extract_expression, extract_signature
+from .tree_traversal import extract_id, extract_type, extract_expression, extract_signature, extract_expression_list
 
 class PatitoSemanticListener(PatitoListener):
     def __init__(self):
@@ -15,7 +15,7 @@ class PatitoSemanticListener(PatitoListener):
         # stacks
         self.variable_stack: Stack[VariableSymbol] = Stack()
         # quadruples
-        self.quadruples_register: Register[ExpQuadruple | FlowQuadruple | StmtQuadruple] = Register()
+        self.quadruples_register: Register[ExpQuadruple | FlowQuadruple | StmtQuadruple | FuncQuadruple] = Register()
         self.true_quadruples_register: Register[TrueQuadruple] = Register()
         # jump resolvers 
         self.quadruple_jump_resolver: JumpResolver[FlowQuadruple] = JumpResolver()
@@ -23,11 +23,21 @@ class PatitoSemanticListener(PatitoListener):
         # address dispatcher
         self.true_quadruple_builder: TrueQuadrupleBuilder = TrueQuadrupleBuilder()
 
+    def enterPrograma(self, ctx: PatitoParser.ProgramaContext):
+        goto__quadruple: FlowQuadruple = FlowQuadruple.GOTO_quadruple()
+        true__goto_quadruple: TrueQuadruple = self.true_quadruple_builder.build_quadruple(goto__quadruple, self.curr_table)
+        self.__register_quadruple(goto__quadruple, true__goto_quadruple)
+        self.__poise_quadruple(goto__quadruple, true__goto_quadruple)
+
+    def exitOpc_lista_func(self, ctx: PatitoParser.Opc_lista_funcContext):
+        if ctx.getChildCount() == 0:
+            self.__resolve_quadruple(self.quadruples_register.next_record_index)
+
     def enterFunc(self, ctx: PatitoParser.FuncContext) -> None:
         # Entering function declaration 
         func_name: str = extract_id(ctx)
         func_signature: Signature = extract_signature(ctx.opc_lista_id_tipo())
-        function: FunctionSymbol = FunctionSymbol(function_id=func_name, signature=func_signature, parent_table=self.curr_table)
+        function: FunctionSymbol = FunctionSymbol(function_id=func_name, signature=func_signature, parent_table=self.curr_table, index=self.quadruples_register.next_record_index)
 
         self.curr_table.add_symbol(function)
         self.curr_table = function.table
@@ -35,6 +45,9 @@ class PatitoSemanticListener(PatitoListener):
     def exitFunc(self, ctx: PatitoParser.FuncContext) -> None:
         # Exiting function body.
         self.curr_table = self.curr_table.parent_table
+        ENDFUNC_quadruple: FuncQuadruple = FuncQuadruple.ENDFUNC_quadruple()
+        true_ENDFUNC_quadruple: TrueQuadruple = self.true_quadruple_builder.build_quadruple(ENDFUNC_quadruple, self.curr_table)
+        self.__register_quadruple(ENDFUNC_quadruple, true_ENDFUNC_quadruple)
 
     def enterLista_id(self, ctx: PatitoParser.Lista_idContext):
         # Entering variable declaration.
@@ -69,7 +82,7 @@ class PatitoSemanticListener(PatitoListener):
         variable: VariableSymbol = get_symbol_uphill(self.curr_table, extract_id(ctx), SymbolType.VARIABLE)
         assignee: OperandPair = VariableSymbol.to_operand_pair(variable)
 
-        assigner: OperandPair = self.__process_expresion(extract_expression(ctx))
+        assigner: OperandPair = self.__process_expresion(extract_expression(ctx.expresion()))
 
         context_quadruple: ExpQuadruple = ExpQuadruple.assignment(assignee, assigner)
         true_context_quadruple: TrueQuadruple = self.true_quadruple_builder.build_quadruple(context_quadruple, self.curr_table)
@@ -82,9 +95,28 @@ class PatitoSemanticListener(PatitoListener):
         if not symbol_exists_uphill(self.curr_table, function_id, SymbolType.FUNCTION):
             raise SemanticError.undeclared_symbol(function_id)
         
+    def exitLlamada(self, ctx: PatitoParser.LlamadaContext):
+        function_symbol: FunctionSymbol = get_symbol_uphill(self.curr_table, extract_id(ctx), SymbolType.FUNCTION)
+        # param 
+        for argument_expression in extract_expression_list(ctx.opc_lista_expresion()):
+            operand: OperandPair = self.__process_expresion(extract_expression(argument_expression))
+            param_quadruple: FuncQuadruple = FuncQuadruple.PARAM_quadruple(operand)
+            true_param_quadruple: TrueQuadruple = self.true_quadruple_builder.build_quadruple(param_quadruple, self.curr_table)
+            self.__register_quadruple(param_quadruple, true_param_quadruple)
+        
+        # era
+        era_quadruple: FuncQuadruple = FuncQuadruple.ERA_quadruple(function_symbol.symbol_id)
+        true_era_quadruple: TrueQuadruple = self.true_quadruple_builder.build_quadruple(era_quadruple, self.curr_table)
+        self.__register_quadruple(era_quadruple, true_era_quadruple)
+
+        # gosub
+        gosub_quadruple: FuncQuadruple = FuncQuadruple.GOSUB_quadruple(function_symbol.index)
+        true_gosub_quadruple: TrueQuadruple = self.true_quadruple_builder.build_quadruple(gosub_quadruple, self.curr_table)
+        self.__register_quadruple(gosub_quadruple, true_gosub_quadruple)
+    
     def enterCondicion(self, ctx: PatitoParser.CicloContext):
         # Entering if statement.
-        operand: OperandPair = self.__process_expresion(extract_expression(ctx))
+        operand: OperandPair = self.__process_expresion(extract_expression(ctx.expresion()))
         
         goto_f: FlowQuadruple = FlowQuadruple.GOTO_F_quadruple(operand)
         true_goto_f: TrueQuadruple = self.true_quadruple_builder.build_quadruple(goto_f, self.curr_table)
@@ -106,7 +138,7 @@ class PatitoSemanticListener(PatitoListener):
         # Entering while loop. 
         self.__poise_jump(self.__get_next_record_index())
 
-        operand: OperandPair = self.__process_expresion(extract_expression(ctx))
+        operand: OperandPair = self.__process_expresion(extract_expression(ctx.expresion()))
 
         goto: FlowQuadruple = FlowQuadruple.GOTO_F_quadruple(operand)
         true_goto: TrueQuadruple = self.true_quadruple_builder.build_quadruple(goto, self.curr_table)
@@ -126,11 +158,11 @@ class PatitoSemanticListener(PatitoListener):
         if ctx.LETRERO() is not None:
             operand: OperandPair = Pair(ctx.LETRERO().getText(), VariableType.LETRERO)
         else:
-            operand: OperandPair = self.__process_expresion(extract_expression(ctx))
+            operand: OperandPair = self.__process_expresion(extract_expression(ctx.expresion()))
 
-        print_quadruple: StmtQuadruple = StmtQuadruple.print(operand)
-        true_print_quadruple: TrueQuadruple = self.true_quadruple_builder.build_quadruple(print_quadruple, self.curr_table)
-        self.__register_quadruple(print_quadruple, true_print_quadruple)
+        imprime_quadruple: StmtQuadruple = StmtQuadruple.IMPRIME_quadruple(operand)
+        true_print_quadruple: TrueQuadruple = self.true_quadruple_builder.build_quadruple(imprime_quadruple, self.curr_table)
+        self.__register_quadruple(imprime_quadruple, true_print_quadruple)
 
     def get_symbols_table(self) -> SymbolsTable:
         return self.root_table
@@ -177,7 +209,7 @@ class PatitoSemanticListener(PatitoListener):
         self.quadruple_jump_resolver.resolve_quadruple(jump)
         self.true_quadruple_jump_resolver.resolve_quadruple(jump)
 
-    def __register_quadruple(self, quadruple: ExpQuadruple | FlowQuadruple | StmtQuadruple, true_quadruple: TrueQuadruple) -> None:
+    def __register_quadruple(self, quadruple: ExpQuadruple | FlowQuadruple | StmtQuadruple | FuncQuadruple, true_quadruple: TrueQuadruple) -> None:
         self.quadruples_register.add_record(quadruple)
         self.true_quadruples_register.add_record(true_quadruple)
     

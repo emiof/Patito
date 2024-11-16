@@ -13,7 +13,7 @@ def table() -> SymbolsTable:
     var2 = VariableSymbol(variable_id='var2', parent_table=root_table)
     VariableSymbol.set_type([var1, var2], VariableType.ENTERO) 
     
-    fun1 = FunctionSymbol(function_id='fun1', signature=[VariableType.ENTERO], parent_table=root_table)
+    fun1 = FunctionSymbol(function_id='fun1', signature=[VariableType.ENTERO], parent_table=root_table, index=0)
 
     curr_table.add_symbol(var1)
     curr_table.add_symbol(var2)

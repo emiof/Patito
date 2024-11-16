@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING
-from ..classifications import QuadrupleType, FlowOperator, StmtOperator, NumericOperator
-from ..containers import Stack
+from ..classifications import QuadrupleType, FlowOperator, StmtOperator, NumericOperator, FuncOperator, VariableType, token_mapper
+from ..containers import Stack, Pair
 from .memory import Memory, MemoryRequirements
-from .operator_code_translation import numeric_operator, flow_operator, stmt_operator
+from .operator_code_translation import numeric_operator, flow_operator, stmt_operator, func_operator
 
 if TYPE_CHECKING:
     from ..quadruples import TrueQuadruple
@@ -10,8 +10,11 @@ if TYPE_CHECKING:
 class Executor:
     def __init__(self, *, quadruples: list['TrueQuadruple'], function_requirements: dict[str, MemoryRequirements], constants: dict[int, int | float | str]):
         self.quadruples: list['TrueQuadruple'] = quadruples
+        self.function_requirements: dict[str, MemoryRequirements] = function_requirements
         self.constants: dict[int, int | float | str] = constants
         self.memory_stack: Stack[Memory] = Stack([Memory(function_requirements['global'])])
+        self.argument_stack: Stack[Pair[int | float, VariableType]] = Stack()
+        self.index_stack: Stack[int] = Stack()
     
     def run(self) -> None:
         self.__process_quadrurple(curr_quadurple_index=0)
@@ -31,6 +34,8 @@ class Executor:
                 next_index: int = self.__handle_flow_quadruple(curr_quadruple, curr_quadurple_index)
             case QuadrupleType.STMT:
                 next_index: int = self.__handle_stmt_quadruple(curr_quadruple, curr_quadurple_index)
+            case QuadrupleType.FUNC:
+                next_index: int = self.__handle_func_quadruple(curr_quadruple, curr_quadurple_index)
             case _:
                 raise ValueError("Encountered quadruple of unknown type") 
         
@@ -67,6 +72,26 @@ class Executor:
                 print(self.__get_from_memory(address=stmt_quadruple.operands[0]))
                 return curr_quadruple_index + 1
             
+    def __handle_func_quadruple(self, func_quadruple: 'TrueQuadruple', curr_quadruple_index: int) -> int:
+        match func_operator(func_quadruple.operator):
+            case FuncOperator.ERA:
+                _, _, _, function_id = func_quadruple
+                self.__create_function_memory(function_id)
+                self.__emplace_function_arguments()
+                return curr_quadruple_index + 1
+            case FuncOperator.PARAM:
+                _, argument_address, _, _ = func_quadruple
+                argument: int | float | str = self.__get_from_memory(address=argument_address)
+                self.argument_stack.push(Pair(argument, token_mapper(str(argument)))) #
+                return curr_quadruple_index + 1
+            case FuncOperator.GOSUB:
+                _, _, _, jump = func_quadruple
+                self.index_stack.push(curr_quadruple_index+1)
+                return jump
+            case FuncOperator.ENDFUNC:
+                self.memory_stack.pop()
+                return self.index_stack.pop()
+            
     def __get_from_memory(self, *, address: int) -> int | float | str:
         if address in self.constants:
             return self.constants[address]
@@ -79,4 +104,11 @@ class Executor:
             return self.memory_stack.first().get_at(at=address)
     
     def __add_to_memory(self, val: int | float, *, address: int) -> None:
-        self.memory_stack.peek().emplace_at(val, at=address)
+            self.memory_stack.peek().emplace_at(val, at=address)
+
+    def __create_function_memory(self, function_id: str) -> None:
+        self.memory_stack.push(Memory(self.function_requirements[function_id]))
+
+    def __emplace_function_arguments(self) -> None:
+        for argument, argument_type in self.argument_stack.pop_all(as_queue=True):
+            self.memory_stack.peek().linear_emplace(argument, variable_type=argument_type)

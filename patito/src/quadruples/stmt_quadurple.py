@@ -9,6 +9,6 @@ class StmtQuadruple:
         self.items: list[StmtOperator, Pair[str, Optional[VariableType]], None, None] = [operator, operand, None, None]
 
     @staticmethod
-    def print(operand: OperandPair) -> 'StmtQuadruple':
+    def IMPRIME_quadruple(operand: OperandPair) -> 'StmtQuadruple':
         return StmtQuadruple(StmtOperator.IMPRIME, operand)
 

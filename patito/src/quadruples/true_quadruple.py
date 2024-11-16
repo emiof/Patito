@@ -4,8 +4,8 @@ from .utils import examinable
 
 @examinable
 class TrueQuadruple:
-    def __init__(self, items: list[int], quadruple_type: QuadrupleType):
-        self.items: list[int] = items
+    def __init__(self, items: list[int | str], quadruple_type: QuadrupleType):
+        self.items: list[int | str] = items
         self.quadruple_type: QuadrupleType = quadruple_type
     
     def set_jump(self, jump: int) -> None:
