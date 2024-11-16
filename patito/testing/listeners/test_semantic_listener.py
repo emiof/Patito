@@ -36,4 +36,6 @@ def test_listener(program: str) -> None:
         constants=listener.get_constants_storage())
     
     executor.run()
+
+    print()
     print(executor.get_global_memory())
