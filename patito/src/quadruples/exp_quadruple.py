@@ -2,7 +2,7 @@ from typing import Optional
 from ..classifications import NumericOperator, VariableType
 from ..semantics import SemanticCube
 from ..containers import  Pair, OperatorPair, OperandPair
-from ..exceptions import SemanticError
+from ..exceptions import SemanticException
 from .utils import examinable
 
 @examinable
@@ -13,7 +13,7 @@ class ExpQuadruple:
     def __init__(self, operator: OperatorPair, operand_1: OperandPair, operand_2: OperandPair, result_is_none: bool = False):
         result_type: VariableType | None = ExpQuadruple.semantic_cube.get_result_type(operator.second, operand_1.second, operand_2.second)
         if result_type is None:
-            raise SemanticError.invalid_operation(operand_1.second, operator.second, operand_2.second)
+            raise SemanticException.invalid_operation(operand_1.second, operator.second, operand_2.second)
         
         if not result_is_none:
             result: OperandPair = Pair(f"t{ExpQuadruple.result_counter}", result_type)

@@ -57,6 +57,7 @@ nula permutaciones(n: entero, k: entero, num_permutaciones: entero){
 inicio {
     k = 5; 
 
+    escribe("hola");
     permutaciones(5, 2, 1);
 }
 

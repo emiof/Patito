@@ -7,6 +7,10 @@ class MemoryRequirements:
     int_range: tuple[int, int]
     float_range: tuple[int, int]
 
+    def __str__(self) -> str:
+        return f"INT_RANGE: {self.int_range[0]}-{self.int_range[1]}, FLOAT_RANGE: {self.float_range[0]}-{self.float_range[1]}"
+
+
 class Memory:
     def __init__(self, requirements: MemoryRequirements):
         int_lower_bound, int_upper_bound = requirements.int_range

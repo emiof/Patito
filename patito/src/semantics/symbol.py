@@ -55,4 +55,4 @@ class FunctionSymbol(Symbol):
         self.table: 'SymbolsTable' = SymbolsTable(table_id=function_id, parent_function=self)
 
     def __str__(self) -> str:
-        return super().__str__() + f" (SIGNATURE: {'->'.join(var_type.name for var_type in self.signature)})"
+        return super().__str__() + f" (SIGNATURE: {'->'.join(var_type.name for var_type in self.signature)}, MEMORY_REQMT: {self.table.build_memory_requirements()})"

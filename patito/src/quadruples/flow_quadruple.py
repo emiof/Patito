@@ -1,6 +1,6 @@
 from typing import Optional, Union
 from ..classifications import VariableType, FlowOperator
-from ..exceptions import SemanticError
+from ..exceptions import SemanticException
 from ..containers import Pair, OperandPair
 from .exp_quadruple import ExpQuadruple
 from .utils import examinable
@@ -9,7 +9,7 @@ from .utils import examinable
 class FlowQuadruple:
     def __init__(self, flow_operator: FlowOperator, operand: OperandPair, jump_location: Optional[int] = None):
         if operand.second != VariableType.ENTERO:
-            raise SemanticError.expected_boolean(operand.first)
+            raise SemanticException.expected_boolean(operand.first)
         self.items: list[FlowOperator, OperandPair, None, Optional[int]] = [flow_operator, operand, None, jump_location]
 
     def set_jump(self, jump: int) -> None:
