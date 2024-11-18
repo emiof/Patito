@@ -3,7 +3,7 @@ from ..semantics import SymbolsTable, VariableSymbol, FunctionSymbol, symbol_exi
 from ..classifications import VariableType, token_mapper, Signature, SymbolType
 from ..containers import Stack, Pair, Register
 from ..quadruples import ExpQuadruple, ExpQuadrupleBuilder, FlowQuadruple, OperandPair, TrueQuadruple, TrueQuadrupleBuilder, JumpResolver, StmtQuadruple, FuncQuadruple
-from ..exceptions import SemanticError
+from ..exceptions import SemanticException
 from ..virtual_machine import MemoryRequirements
 from .tree_traversal import extract_id, extract_type, extract_expression, extract_signature, extract_expression_list
 
@@ -75,25 +75,25 @@ class PatitoSemanticListener(PatitoListener):
         # Entering variable assignment.
         variable_id: str = extract_id(ctx)
         if not symbol_exists_uphill(self.curr_table, variable_id, SymbolType.VARIABLE):
-            raise SemanticError.undeclared_symbol(variable_id)
+            raise SemanticException.undeclared_symbol(variable_id)
         
     def exitAsigna(self, ctx: PatitoParser.AsignaContext):
         # Existing variable assignment.
-        variable: VariableSymbol = get_symbol_uphill(self.curr_table, extract_id(ctx), SymbolType.VARIABLE)
-        assignee: OperandPair = VariableSymbol.to_operand_pair(variable)
+        assignee_variable: VariableSymbol = get_symbol_uphill(self.curr_table, extract_id(ctx), SymbolType.VARIABLE)
+        assignee: OperandPair = VariableSymbol.to_operand_pair(assignee_variable)
 
         assigner: OperandPair = self.__process_expresion(extract_expression(ctx.expresion()))
 
-        context_quadruple: ExpQuadruple = ExpQuadruple.assignment(assignee, assigner)
-        true_context_quadruple: TrueQuadruple = self.true_quadruple_builder.build_quadruple(context_quadruple, self.curr_table)
-        self.__register_quadruple(context_quadruple, true_context_quadruple)
-        variable.is_initialized = True
+        assignment_quadruple: ExpQuadruple = ExpQuadruple.assignment(assignee, assigner)
+        true_context_quadruple: TrueQuadruple = self.true_quadruple_builder.build_quadruple(assignment_quadruple, self.curr_table)
+        self.__register_quadruple(assignment_quadruple, true_context_quadruple)
+        assignee_variable.is_initialized = True
         
     def enterLlamada(self, ctx: PatitoParser.LlamadaContext):
         # Entering function call.
         function_id: str = extract_id(ctx)
         if not symbol_exists_uphill(self.curr_table, function_id, SymbolType.FUNCTION):
-            raise SemanticError.undeclared_symbol(function_id)
+            raise SemanticException.undeclared_symbol(function_id)
         
     def exitLlamada(self, ctx: PatitoParser.LlamadaContext):
         function_symbol: FunctionSymbol = get_symbol_uphill(self.curr_table, extract_id(ctx), SymbolType.FUNCTION)
@@ -185,7 +185,9 @@ class PatitoSemanticListener(PatitoListener):
     
     def __process_expresion(self, expression_tokens: list[str]) -> OperandPair:
         if len(expression_tokens) == 1:
-            return Pair(expression_tokens[0], token_mapper(expression_tokens[0]))
+            operand_type: VariableType | None = token_mapper(expression_tokens[0])
+            operand_type = get_symbol_uphill(self.curr_table, expression_tokens[0], SymbolType.VARIABLE).variable_type if operand_type is None else operand_type
+            return Pair(expression_tokens[0], operand_type)
         
         *quadruples, final_quadruple = ExpQuadrupleBuilder(expression_tokens, self.curr_table).build_quadruples()
         self.__register_quadruples_batch([*quadruples, final_quadruple], self.true_quadruple_builder.build_quadruples([*quadruples, final_quadruple], self.curr_table))
@@ -225,8 +227,8 @@ class PatitoSemanticListener(PatitoListener):
 
     def __validate_function_signature(self, provided_signature: Signature, expected_signature: Signature, function_id: str) -> None:
         if len(provided_signature) != len(expected_signature):
-            raise SemanticError.arity_mismatch(function_id, len(provided_signature), len(expected_signature))
+            raise SemanticException.arity_mismatch(function_id, len(provided_signature), len(expected_signature))
         
         for provided_param_type, expected_param_type in zip(provided_signature, expected_signature):
             if provided_param_type != expected_param_type:
-                raise SemanticError.type_mismatch(provided_param_type, expected_param_type)
+                raise SemanticException.type_mismatch(provided_param_type, expected_param_type)

@@ -32,4 +32,6 @@ def token_mapper(token: str) -> NumericOperator | VariableType | None:
             return VariableType.FLOTANTE
         case _ if letrero_pattern.fullmatch(token):
             return VariableType.LETRERO
+        case _:
+            return None
 

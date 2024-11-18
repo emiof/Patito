@@ -1,7 +1,7 @@
 # Python Version: 3.11.8
 
 from typing import Optional, TYPE_CHECKING, Union
-from ..exceptions import SemanticError
+from ..exceptions import SemanticException
 from ..classifications import SymbolType, VariableType
 from ..containers import AddressTable, OperandPair
 from ..virtual_machine import MemoryRequirements
@@ -40,7 +40,7 @@ class SymbolsTable:
     
     def add_symbol(self, symbol: Union['VariableSymbol', 'FunctionSymbol']) -> Union['VariableSymbol', 'FunctionSymbol']:
         if self.symbol_exists(symbol.symbol_id, symbol.symbol_type):
-            raise SemanticError.redeclaration(symbol.symbol_id)
+            raise SemanticException.redeclaration(symbol.symbol_id)
         
         match symbol.symbol_type:
             case SymbolType.VARIABLE:

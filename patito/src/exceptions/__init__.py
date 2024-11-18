@@ -1,1 +1,1 @@
-from .patito_exceptions import *
+from .patito_exceptions import SemanticException, SyntaxException

@@ -1,7 +1,7 @@
 from ..containers import Stack, Pair, OperatorPair, OperandPair
 from ..semantics import VariableSymbol, SymbolsTable, symbol_exists_uphill, get_symbol_uphill
 from ..classifications import token_mapper, VariableType, NumericOperator, SymbolType
-from ..exceptions import SemanticError
+from ..exceptions import SemanticException
 from .exp_quadruple import ExpQuadruple
 
 class ExpQuadrupleBuilder:
@@ -57,11 +57,11 @@ class ExpQuadrupleBuilder:
     def __push_id_operand(self) -> None:
         variable_id, _ = self.token_stack.peek()
         if not symbol_exists_uphill(self.symbols_table, variable_id, SymbolType.VARIABLE):
-            raise SemanticError.undeclared_symbol(variable_id)
+            raise SemanticException.undeclared_symbol(variable_id)
         
         variable: VariableSymbol = get_symbol_uphill(self.symbols_table, variable_id, SymbolType.VARIABLE)  
         if not variable.is_initialized:
-            raise SemanticError.uninitialized(variable.symbol_id)
+            raise SemanticException.uninitialized(variable.symbol_id)
         self.operand_stack.push(VariableSymbol.to_operand_pair(variable))
         self.token_stack.pop()
 

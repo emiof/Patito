@@ -1,7 +1,7 @@
 import pytest
 from antlr4 import ParseTreeWalker
 from ..utils import build_parser
-from ...src.listeners import PatitoSemanticListener
+from ...src.listeners import PatitoSemanticListener, PatitoErrorListener
 from ...src.semantics import SymbolsTable
 from ...src.quadruples import ExpQuadruple, TrueQuadruple, FlowQuadruple
 from ...src.containers import Register
@@ -14,8 +14,9 @@ programs: list[tuple[str]] = [
 @pytest.mark.parametrize('program', programs)
 def test_listener(program: str) -> None:
     parser = build_parser(program)
-
     listener = PatitoSemanticListener()
+    error_listener = PatitoErrorListener()
+    parser.addErrorListener(error_listener)
     tree = parser.programa()
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
