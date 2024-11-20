@@ -1,5 +1,5 @@
 from ..syntax import PatitoListener, PatitoParser
-from ..semantics import SymbolsTable, VariableSymbol, FunctionSymbol, symbol_exists_uphill, get_symbol_uphill, build_memory_requiremnts_downhill
+from ..semantics import SymbolsTable, VariableSymbol, FunctionSymbol, symbol_exists_uphill, get_symbol_uphill, build_memory_requiremnts_downhill, validate_initialization_downhill
 from ..classifications import VariableType, token_mapper, Signature, SymbolType
 from ..containers import Stack, Pair, Register
 from ..quadruples import ExpQuadruple, ExpQuadrupleBuilder, FlowQuadruple, OperandPair, TrueQuadruple, TrueQuadrupleBuilder, JumpResolver, StmtQuadruple, FuncQuadruple
@@ -29,6 +29,9 @@ class PatitoSemanticListener(PatitoListener):
         self.__register_quadruple(goto__quadruple, true__goto_quadruple)
         self.__poise_quadruple(goto__quadruple, true__goto_quadruple)
 
+    def exitPrograma(self, ctx: PatitoParser.ProgramaContext):
+        validate_initialization_downhill(self.root_table)
+
     def exitOpc_lista_func(self, ctx: PatitoParser.Opc_lista_funcContext):
         if ctx.getChildCount() == 0:
             self.__resolve_quadruple(self.quadruples_register.next_record_index)
@@ -37,7 +40,7 @@ class PatitoSemanticListener(PatitoListener):
         # Entering function declaration 
         func_name: str = extract_id(ctx)
         func_signature: Signature = extract_signature(ctx.opc_lista_id_tipo())
-        function: FunctionSymbol = FunctionSymbol(function_id=func_name, signature=func_signature, parent_table=self.curr_table, index=self.quadruples_register.next_record_index)
+        function: FunctionSymbol = FunctionSymbol(function_id=func_name, signature=func_signature, parent_table=self.curr_table, index=self.__get_next_record_index())
 
         self.curr_table.add_symbol(function)
         self.curr_table = function.table

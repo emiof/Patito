@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 from ..classifications import QuadrupleType, FlowOperator, StmtOperator, NumericOperator, FuncOperator, VariableType, token_mapper
 from ..containers import Stack, Pair
+from ..exceptions import SemanticException
 from .memory import Memory, MemoryRequirements
 from .operator_code_translation import numeric_operator, flow_operator, stmt_operator, func_operator
 
@@ -13,6 +14,7 @@ class Executor:
         self.function_requirements: dict[str, MemoryRequirements] = function_requirements
         self.constants: dict[int, int | float | str] = constants
         self.memory_stack: Stack[Memory] = Stack([Memory(function_requirements['global'])])
+        self.num_max_calls: int = 500
         self.argument_stack: Stack[Pair[int | float, VariableType]] = Stack()
         self.index_stack: Stack[int] = Stack()
     
@@ -23,24 +25,22 @@ class Executor:
         return self.memory_stack.first()
 
     def __process_quadrurple(self, curr_quadurple_index: int) -> None:
-        if curr_quadurple_index == len(self.quadruples):
-            return 
-        
-        curr_quadruple: 'TrueQuadruple' = self.quadruples[curr_quadurple_index]
-        match curr_quadruple.quadruple_type:
-            case QuadrupleType.EXP:
-                next_index: int = self.__handle_exp_quadruple(curr_quadruple, curr_quadurple_index)
-            case QuadrupleType.FLOW:
-                next_index: int = self.__handle_flow_quadruple(curr_quadruple, curr_quadurple_index)
-            case QuadrupleType.STMT:
-                next_index: int = self.__handle_stmt_quadruple(curr_quadruple, curr_quadurple_index)
-            case QuadrupleType.FUNC:
-                next_index: int = self.__handle_func_quadruple(curr_quadruple, curr_quadurple_index)
-            case _:
-                raise ValueError("Encountered quadruple of unknown type") 
-        
-        self.__process_quadrurple(next_index)
+        while curr_quadurple_index < len(self.quadruples):
+            curr_quadruple: 'TrueQuadruple' = self.quadruples[curr_quadurple_index]
+            match curr_quadruple.quadruple_type:
+                case QuadrupleType.EXP:
+                    next_index: int = self.__handle_exp_quadruple(curr_quadruple, curr_quadurple_index)
+                case QuadrupleType.FLOW:
+                    next_index: int = self.__handle_flow_quadruple(curr_quadruple, curr_quadurple_index)
+                case QuadrupleType.STMT:
+                    next_index: int = self.__handle_stmt_quadruple(curr_quadruple, curr_quadurple_index)
+                case QuadrupleType.FUNC:
+                    next_index: int = self.__handle_func_quadruple(curr_quadruple, curr_quadurple_index)
+                case _:
+                    raise ValueError("Encountered quadruple of unknown type") 
             
+            curr_quadurple_index = next_index
+        
     def __handle_exp_quadruple(self, exp_quadurple: 'TrueQuadruple', curr_quadruple_index: int) -> int:
         if exp_quadurple.operator == NumericOperator.ASIGNACION.value:
             assigne_address, assigner_address = exp_quadurple.operands
@@ -104,9 +104,14 @@ class Executor:
             return self.memory_stack.first().get_at(at=address)
     
     def __add_to_memory(self, val: int | float, *, address: int) -> None:
-            self.memory_stack.peek().emplace_at(val, at=address)
+            try:
+                self.memory_stack.peek().emplace_at(val, at=address)
+            except ValueError as _: 
+                self.memory_stack.first().emplace_at(val, at=address)
 
     def __create_function_memory(self, function_id: str) -> None:
+        if self.memory_stack.size() == self.num_max_calls:
+            raise SemanticException.stack_overflow(self.num_max_calls)
         self.memory_stack.push(Memory(self.function_requirements[function_id]))
 
     def __emplace_function_arguments(self) -> None:

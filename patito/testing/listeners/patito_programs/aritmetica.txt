@@ -1,0 +1,56 @@
+programa aritmetica;
+
+var k: entero; 
+
+nula acumula(k: entero){
+    var acumulacion: entero;
+
+    {
+        acumulacion = 0;
+        
+        mientras (k > 0) haz {
+            acumulacion = acumulacion + k;
+            k = k - 1;
+        }; 
+
+        escribe(acumulacion);
+    }
+};
+
+nula resta(a: entero, b: entero){
+    {
+        escribe(a - b);
+    }
+};
+
+nula haz_zero(){
+    {
+        si (k > 0){
+            haz_zero(); 
+        }; 
+    }
+}; 
+
+nula divide_n(val: flotante, n: entero){
+    {
+        si (n > 0){
+            divide_n(val / 2, n-1); 
+        } sino {
+            escribe(val); 
+        }; 
+    }
+}; 
+
+
+inicio {
+    k = 5; 
+
+    resta(k, 100); 
+    acumula(k); 
+    escribe("divide");
+    divide_n(2.0, 2); 
+
+}
+
+fin
+

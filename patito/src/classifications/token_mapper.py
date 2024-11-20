@@ -2,8 +2,8 @@ from .numeric_operators import NumericOperator
 from .variable_types import VariableType
 import re
 
-entero_pattern: re.Pattern = re.compile(r"[0-9]+")
-flotante_pattern: re.Pattern = re.compile(r"[0-9]+\.[0-9]+")
+entero_pattern: re.Pattern = re.compile(r"-?[0-9]+")
+flotante_pattern: re.Pattern = re.compile(r"-?[0-9]+\.[0-9]+")
 letrero_pattern: re.Pattern = re.compile(r"(?:'[a-zA-Z0-9_\",;.: ]*')|(?:\"[a-zA-Z0-9_',;.: ]*\")")
 
 def token_mapper(token: str) -> NumericOperator | VariableType | None:

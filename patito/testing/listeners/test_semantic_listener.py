@@ -8,7 +8,10 @@ from ...src.containers import Register
 from ...src.virtual_machine import Executor
 
 programs: list[tuple[str]] = [
-    ("testing/listeners/patito_programs/patito_program3.txt")
+    ("testing/listeners/patito_programs/factorial.txt"),
+    ("testing/listeners/patito_programs/num_combinaciones.txt"),
+    ("testing/listeners/patito_programs/aritmetica.txt"),
+    ("testing/listeners/patito_programs/permutaciones.txt")
 ]
 
 @pytest.mark.parametrize('program', programs)
