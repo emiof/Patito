@@ -60,8 +60,6 @@ class ExpQuadrupleBuilder:
             raise SemanticException.undeclared_symbol(variable_id)
         
         variable: VariableSymbol = get_symbol_uphill(self.symbols_table, variable_id, SymbolType.VARIABLE)  
-        if not variable.is_initialized:
-            raise SemanticException.uninitialized(variable.symbol_id)
         self.operand_stack.push(VariableSymbol.to_operand_pair(variable))
         self.token_stack.pop()
 

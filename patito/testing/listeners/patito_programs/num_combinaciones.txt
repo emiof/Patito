@@ -1,0 +1,28 @@
+programa num_combinaciones;
+
+var resultado: entero;
+
+nula num_combinaciones(n: entero, k: entero){
+    {
+        si (n == 0){
+            si (k == 0){
+                resultado = resultado + 1;
+            };
+        } sino {
+            num_combinaciones(n-1, k-1); 
+            num_combinaciones(n-1, k); 
+        }; 
+    }
+}; 
+
+
+inicio {
+    resultado = 0; 
+
+    num_combinaciones(10, 2); 
+
+    escribe("Combinaciones:", resultado); 
+}
+
+fin
+

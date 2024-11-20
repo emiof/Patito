@@ -1,0 +1,34 @@
+programa factorial;
+
+
+nula factorial_recursivo(k: entero, producto: entero){
+    {
+        si (k == 0){
+            escribe(producto); 
+        } sino {
+            factorial_recursivo(k-1, k * producto); 
+        }; 
+    }
+};
+
+nula factorial_iterativo(k: entero) {
+    var producto: entero;
+
+    {
+        producto = 1; 
+        mientras (k > 0) haz {
+            producto = producto * k; 
+            k = k - 1; 
+        }; 
+
+        escribe(producto); 
+    }
+}; 
+
+
+inicio {
+    factorial_recursivo(4, 1); 
+    factorial_iterativo(4); 
+}
+
+fin

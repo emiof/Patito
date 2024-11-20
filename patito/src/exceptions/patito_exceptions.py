@@ -31,6 +31,10 @@ class SemanticException(Exception):
     @classmethod
     def type_mismatch(cls: 'SemanticException', provided_type: VariableType, expected_type: VariableType) -> 'SemanticException':
         return cls(f"type mismatch, {provided_type.name} was given when {expected_type.name} was expected")
+    
+    @classmethod
+    def stack_overflow(cls: 'SemanticException', max_num_calls: int) -> 'SemanticException':
+        return cls(f"stack overflow, the maximum number of active functions calls {max_num_calls} was exceeded")
 
 class SyntaxException(Exception):
     def __init__(self, message: str):

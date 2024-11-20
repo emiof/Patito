@@ -1,0 +1,22 @@
+programa permutaciones;
+
+var k: entero; 
+
+nula permutaciones(n: entero, k: entero, num_permutaciones: entero){
+    {
+        si (k == 0){
+            escribe(num_permutaciones);
+        } sino {
+            permutaciones(n, k-1, n * num_permutaciones);
+        };
+    }
+};
+
+inicio {
+    k = 5; 
+
+    permutaciones(k, 2, 1);
+}
+
+fin
+

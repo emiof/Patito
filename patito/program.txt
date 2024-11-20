@@ -13,15 +13,7 @@ nula factorial(k: entero, producto: entero){
     }
 };
 
-nula fibonnaci(k: entero, l: entero, r: entero, suma: entero){
-    { 
-        si (k == 0){
-            escribe(suma);
-        } sino {
-            fibonnaci(k - 1, r, suma, suma + l + r);
-        };
-    }
-};
+
 
 nula suma(k: entero){
     var sum: entero;
@@ -54,11 +46,16 @@ nula permutaciones(n: entero, k: entero, num_permutaciones: entero){
     }
 };
 
+nula inifinito(){
+    {
+        inifinito(); 
+    }   
+};
+
 inicio {
     k = 5; 
 
-    escribe("hola");
-    permutaciones(5, 2, 1);
+    factorial(5, 1);
 }
 
 fin

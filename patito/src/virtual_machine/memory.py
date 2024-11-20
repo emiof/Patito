@@ -38,11 +38,11 @@ class Memory:
     def get_at(self, *, at: int) -> int | float:
         if self.__within_range(at, self.requirements.int_range):
             if self.int_section[at - self.requirements.int_range[0]] is None:
-                raise IndexError(f"attempting to access an empty memory slot with address: {at}")
+                raise IndexError(f"attempting to access an unititialized memory slot with address: {at}")
             return self.int_section[at - self.requirements.int_range[0]]
         elif self.__within_range(at, self.requirements.float_range):
             if self.float_section[at - self.requirements.float_range[0]] is None:
-                raise IndexError(f"attempting to access an empty memory slot with address: {at}")
+                raise IndexError(f"attempting to access an unititialized empty memory slot with address: {at}")
             return self.float_section[at - self.requirements.float_range[0]]
         else: 
             raise ValueError(f"an out-of-bounds address was provided: {at}")

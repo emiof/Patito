@@ -1,3 +1,4 @@
+from ..exceptions import SemanticException
 from ..classifications import SymbolType
 from ..virtual_machine import MemoryRequirements
 from .symbols_table import SymbolsTable
@@ -27,4 +28,13 @@ def build_memory_requiremnts_downhill(curr_table: SymbolsTable) -> dict[str, Mem
             memory_requirements.update(build_memory_requiremnts_downhill(symbol.table))
     
     return memory_requirements
+
+def validate_initialization_downhill(curr_table: SymbolsTable) -> None:
+    for symbol in curr_table.get_all_symbols():
+        if symbol.is_function():
+            validate_initialization_downhill(symbol.table)
+        elif not symbol.is_initialized:
+            raise SemanticException.uninitialized(symbol.symbol_id)
+            
+
 
