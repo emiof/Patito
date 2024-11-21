@@ -13,9 +13,13 @@ nula permutaciones(n: entero, k: entero, num_permutaciones: entero){
 };
 
 inicio {
-    k = 5; 
+    k = 10; 
 
-    permutaciones(k, 2, 1);
+    si (k > 0){
+        permutaciones(k, 2, 1);
+    } sino {
+        escribe("K debe ser mayor a 0"); 
+    }; 
 }
 
 fin
