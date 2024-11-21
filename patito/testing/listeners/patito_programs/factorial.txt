@@ -27,8 +27,8 @@ nula factorial_iterativo(k: entero) {
 
 
 inicio {
-    factorial_recursivo(4, 1); 
-    factorial_iterativo(4); 
+    factorial_recursivo(5, 1); 
+    factorial_iterativo(5); 
 }
 
 fin

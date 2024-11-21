@@ -43,13 +43,11 @@ nula divide_n(val: flotante, n: entero){
 
 
 inicio {
-    k = 5; 
+    k = 10 - 5; 
 
     resta(k, 100); 
     acumula(k); 
-    escribe("divide");
     divide_n(2.0, 2); 
-
 }
 
 fin
